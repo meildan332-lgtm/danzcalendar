@@ -2701,3 +2701,6 @@ window.addEventListener('error', () => {
     }
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+    initApp();
+});
