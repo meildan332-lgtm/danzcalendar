@@ -71,7 +71,8 @@
         if (secretKey !== currentPassword && secretKey !== adminPassword) {
             alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
             window.location.href = "https://cafe.naver.com/flower509";
-            // 여기서 코드를 멈추고 리다이렉트 시킵니다.
+
+            throw new Error("Unauthorized");
         } else {
             // 키 값이 맞을 때만 실행되도록 로직을 분리
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
