@@ -2,7 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, orderBy, addDoc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-=========================================================================
 // 🔒 [추가된 코드] 사이트 접속 제어 및 즐겨찾기 방지
 // =========================================================================
 const urlParams = new URLSearchParams(window.location.search);
@@ -2689,7 +2688,7 @@ async function initApp() {
             renderCalendar();
         }
     });
-}
+
 
 // Use window.onload to ensure all resources are loaded before hiding the loading screen
 window.onload = async () => {
@@ -2721,3 +2720,4 @@ window.addEventListener('error', () => {
     const loadingOverlay = document.getElementById('loadingOverlay');
     if (loadingOverlay) loadingOverlay.classList.add('hidden');
 });
+}
