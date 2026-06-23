@@ -5,17 +5,28 @@
         (function() {
             const urlParams = new URLSearchParams(window.location.search);
             const key = urlParams.get('key');
-            if (key !== "1as542fs" && key !== "danz59_nimda") {
-                alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
-                window.location.replace("https://cafe.naver.com/flower509");
+            const cafeUrl = "https://cafe.naver.com/flower509";
+            
+            // 1. 세션 스토리지에서 인증 여부 확인 (탭을 닫으면 사라짐)
+            const isVerified = sessionStorage.getItem('danz_auth') === 'true';
+
+            // 2. 키가 있거나 이미 세션 인증이 된 경우
+            if (key === "1as542fs" || key === "danz59_nimda") {
+                sessionStorage.setItem('danz_auth', 'true'); // 세션에 인증 저장
+            } else if (!isVerified) {
+                // 키도 없고 세션 기록도 없으면 카페로 이동
+                alert("일정 확인을 위해 단즈님 팬카페를 통해 접속해 주세요.");
+                window.location.replace(cafeUrl);
+                return;
             }
 
+            // 3. 인증 성공 시 주소창 깔끔하게 정리
             if (window.history.replaceState) {
-            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
+                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
             }
         })();
-    </script>    
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DANZ</title>
