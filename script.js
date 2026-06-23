@@ -2689,7 +2689,7 @@ async function initApp() {
             renderCalendar();
         }
     });
-    
+
     await showEntryPopupIfItemsExist();
 }
 
@@ -2712,5 +2712,6 @@ window.addEventListener('error', () => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOMContentLoaded 실행");
     initApp();
 });
