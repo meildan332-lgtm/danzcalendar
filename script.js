@@ -2588,16 +2588,23 @@ window.showDayInfo = function(dateId, dayEvents) {
             
             cardWrapper.innerHTML = `
                 <div class="info-block" style="flex:1; display:flex; flex-direction:column; margin:0;">
+                    <!-- 1. 일정 제목 -->
                     <h2 style="text-align:center; margin-top:0; margin-bottom:20px; font-size:34px; font-weight:900; word-break:keep-all;">${ev.title || ''}</h2>
+                    
                     <div style="text-align:center; margin-bottom: 30px;">
                         <div class="info-time ${typeClass}" style="display:inline-block; padding: 10px 24px; border-radius: 30px; font-weight: 800; font-size: 18px;">
                             ${timeTypeStr}
                         </div>
-                    </div>                    <div class="info-image-container" style="text-align:center; margin-bottom: 20px;">
-                        ${ev.imageUrl ? `<img src="${ev.imageUrl}" alt="${ev.title}" class="info-image" style="max-width:100%; border-radius:30px;" onerror="this.outerHTML='<a href=&quot;${ev.imageUrl}&quot; target=&quot;_blank&quot; class=&quot;info-link&quot;>이미지 보기</a>'">` : ''}
                     </div>
+                    
+                    <!-- 2. 멤버 리스트 (이미지보다 위로 이동) -->
                     <div class="info-profiles" style="display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-bottom: 30px;">
                         ${profsHtml}
+                    </div>
+                    
+                    <!-- 3. 이미지 (가장 아래로 이동) -->
+                    <div class="info-image-container" style="text-align:center; margin-bottom: 20px;">
+                        ${ev.imageUrl ? `<img src="${ev.imageUrl}" alt="${ev.title}" class="info-image" style="max-width:100%; border-radius:30px;" onerror="this.outerHTML='<a href=&quot;${ev.imageUrl}&quot; target=&quot;_blank&quot; class=&quot;info-link&quot;>이미지 보기</a>'">` : ''}
                     </div>
                 </div>
             `;
@@ -2644,6 +2651,7 @@ async function initApp() {
         updateAdminUI();
 
         await window.showTab('schedule');
+        await showEntryPopupIfItemsExist();
 
     } catch (error) {
         console.error('초기 로딩 중 오류 발생:', error);
