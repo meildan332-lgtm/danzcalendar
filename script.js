@@ -2641,6 +2641,8 @@ document.addEventListener('dragstart', function(e) {
 });
 
 async function initApp() {
+    console.log("팝업 호출 직전");
+    await showEntryPopupIfItemsExist();
 
     const loadingOverlay = document.getElementById('loadingOverlay');
 
@@ -2651,21 +2653,19 @@ async function initApp() {
         updateAdminUI();
 
         await window.showTab('schedule');
+        
+        // 팝업 호출 함수를 명시적으로 호출합니다.
         await showEntryPopupIfItemsExist();
 
     } catch (error) {
         console.error('초기 로딩 중 오류 발생:', error);
-
     } finally {
-        document.body.classList.remove('is-loading');
-
         if (loadingOverlay) {
             loadingOverlay.classList.add('hidden');
-            setTimeout(() => {
-                loadingOverlay.remove();
-            }, 500);
+            setTimeout(() => { loadingOverlay.remove(); }, 500);
         }
     }
+
 
     const btnMin = document.getElementById('btnMin');
 
