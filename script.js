@@ -2635,22 +2635,6 @@ document.addEventListener('dragstart', function(e) {
 
 async function initApp() {
 
-        // 🔒 [추가된 코드] 사이트 접속 제어 및 즐겨찾기 방지
-    const urlParams = new URLSearchParams(window.location.search);
-    const secretKey = urlParams.get('key');
-    const currentPassword = "1as542fs";  // 방문자용 암호
-    const adminPassword = "danz59_nimda"; // 관리자용 암호
-
-    if (secretKey !== currentPassword && secretKey !== adminPassword) {
-        alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
-        // 👇 [게시물 링크 등록하는 곳] 아래 주소를 튕겨낼 카페 게시글 링크로 바꿔주세요!
-        window.location.href = "https://cafe.naver.com/flower509"; 
-    } else {
-        // 주소창에서 열쇠 숨기기 (깡통 주소만 즐겨찾기 되도록 만듦)
-        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
-        window.history.replaceState({}, document.title, cleanUrl);
-    }
-
     const loadingOverlay = document.getElementById('loadingOverlay');
     try {
         await seedAdmin();
@@ -2692,21 +2676,20 @@ async function initApp() {
 // Use window.onload to ensure all resources are loaded before hiding the loading screen
 window.onload = async () => {
     try {
-        // 👇 이 부분이 지워져서 캘린더가 안 떴던 것입니다! 다시 시동을 걸어줍니다.
         await initApp();
-        
+        window.checkAndShowPopup();
     } catch (error) {
         console.error('초기 로딩 중 오류 발생:', error);
+    } finally {
+        // 성공하든 실패하든 무조건 1초 뒤에 로딩창을 숨김 (무한 로딩 방지)
+        setTimeout(() => {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) { 
+                loadingOverlay.classList.add('hidden');
+                setTimeout(() => loadingOverlay.remove(), 500);
+            }
+        }, 1000);
     }
-
-    // ⭐️ 팝업 띄우기 함수 실행!
-    window.checkAndShowPopup();
-
-    // 기존의 로딩 화면 지우는 코드
-    setTimeout(() => {
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        if (loadingOverlay) { loadingOverlay.classList.add('hidden'); }
-    }, 1000);
 };
 
 window.addEventListener('unhandledrejection', (event) => {
