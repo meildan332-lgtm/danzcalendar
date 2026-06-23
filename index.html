@@ -9,6 +9,11 @@
                 alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
                 window.location.replace("https://cafe.naver.com/flower509");
             }
+
+            if (window.history.replaceState) {
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            }
         })();
     </script>    
     <meta charset="UTF-8">
