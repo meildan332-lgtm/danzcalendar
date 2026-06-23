@@ -60,8 +60,29 @@
         <img src="https://i.postimg.cc/RF7Qm9z3/danjeu-baeneo.jpg" alt="썸네일">
     </div>
 
-    <!-- 상단바(fixed-top-bar) 삭제 완료 -->
+<!-- [여기부터 보안 코드] -->
+<script>
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const secretKey = urlParams.get('key');
+        const currentPassword = "1as542fs";  
+        const adminPassword = "danz59_nimda"; 
 
+        if (secretKey !== currentPassword && secretKey !== adminPassword) {
+            alert("잘못된 접근입니다. 네이버 카페를 통해 접속해 주세요.");
+            window.location.href = "https://cafe.naver.com/brownrakr7/64";
+            // 여기서 코드를 멈추고 리다이렉트 시킵니다.
+        } else {
+            // 키 값이 맞을 때만 실행되도록 로직을 분리
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    })();
+</script>
+<!-- [여기까지] -->
+
+<div id="loadingOverlay" class="loading-overlay">
+    <!-- 기존 로딩 코드 -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="custom-loading-container">
             <div style="position: relative; width: 190px; height: 190px; display: flex; justify-content: center; align-items: center; margin: 0 auto;">
