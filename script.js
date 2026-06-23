@@ -2689,6 +2689,8 @@ async function initApp() {
             renderCalendar();
         }
     });
+    
+    await showEntryPopupIfItemsExist();
 }
 
 window.addEventListener('unhandledrejection', (event) => {
