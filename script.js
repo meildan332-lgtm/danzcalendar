@@ -2636,28 +2636,37 @@ document.addEventListener('dragstart', function(e) {
 async function initApp() {
 
     const loadingOverlay = document.getElementById('loadingOverlay');
+
     try {
         await seedAdmin();
         await loadData();
-        initAuth(); 
-        updateAdminUI(); 
+        initAuth();
+        updateAdminUI();
 
         await window.showTab('schedule');
-        
+
     } catch (error) {
         console.error('초기 로딩 중 오류 발생:', error);
+
     } finally {
         document.body.classList.remove('is-loading');
-        if (loadingOverlay) { 
-            loadingOverlay.classList.add('hidden'); 
-            setTimeout(() => { loadingOverlay.remove(); }, 500); 
+
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+            setTimeout(() => {
+                loadingOverlay.remove();
+            }, 500);
         }
     }
 
     const btnMin = document.getElementById('btnMin');
-    if(btnMin) btnMin.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+
+    if (btnMin) {
+        btnMin.innerHTML = `...`;
+    }
 
     const loginBtns = document.querySelectorAll('#adminBtn, #adminBtn_pc');
+
     loginBtns.forEach(btn => {
         btn.onclick = (e) => {
             window.promptAdmin(e);
@@ -2665,41 +2674,30 @@ async function initApp() {
     });
 
     let lastWidth = window.innerWidth;
+
     window.addEventListener('resize', () => {
         if (window.innerWidth !== lastWidth) {
             lastWidth = window.innerWidth;
             renderCalendar();
         }
     });
-
-
-// Use window.onload to ensure all resources are loaded before hiding the loading screen
-window.onload = async () => {
-    try {
-        await initApp();
-        window.checkAndShowPopup();
-    } catch (error) {
-        console.error('초기 로딩 중 오류 발생:', error);
-    } finally {
-        // [강제 로딩 해제] 에러가 나든 말든 1.5초 후에는 무조건 숨김
-        setTimeout(() => {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => loadingOverlay.remove(), 500);
-            }
-        }, 1500);
-    }
-};
+}
 
 window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled promise rejection:', event.reason);
+
     const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+    }
 });
 
 window.addEventListener('error', () => {
     const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) loadingOverlay.classList.add('hidden');
+
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+    }
 });
-}
+
