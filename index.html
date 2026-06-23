@@ -65,17 +65,14 @@
     (function() {
         const urlParams = new URLSearchParams(window.location.search);
         const secretKey = urlParams.get('key');
-        const currentPassword = "1as542fs";  
-        const adminPassword = "danz59_nimda"; 
-
-        if (secretKey !== currentPassword && secretKey !== adminPassword) {
-            alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
-            window.location.href = "https://cafe.naver.com/flower509";
-            // 여기서 코드를 완전히 멈추기 위해 리턴
-            window.stop(); 
-        } else {
-            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
-            window.history.replaceState({}, document.title, cleanUrl);
+        
+        // 키가 없거나 틀렸을 때
+        if (secretKey !== "1as542fs" && secretKey !== "danz59_nimda") {
+            // 브라우저의 모든 통신 중단
+            window.stop();
+            // 즉시 이동 (replace는 뒤로가기로 돌아올 수 없게 함)
+            window.location.replace("https://cafe.naver.com/flower509");
+            throw new Error("Redirecting...");
         }
     })();
 </script>

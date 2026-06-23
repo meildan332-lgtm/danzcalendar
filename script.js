@@ -2675,20 +2675,20 @@ async function initApp() {
 
 // Use window.onload to ensure all resources are loaded before hiding the loading screen
 window.onload = async () => {
+    // 1. 보안 코드가 이미 html에서 실행되었으므로 
+    // 여기서는 캘린더 구동만 집중합니다.
     try {
         await initApp();
         window.checkAndShowPopup();
     } catch (error) {
         console.error('초기 로딩 중 오류 발생:', error);
     } finally {
-        // 성공하든 실패하든 무조건 1초 뒤에 로딩창을 숨김 (무한 로딩 방지)
-        setTimeout(() => {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (loadingOverlay) { 
-                loadingOverlay.classList.add('hidden');
-                setTimeout(() => loadingOverlay.remove(), 500);
-            }
-        }, 1000);
+        // 로딩 화면 숨기기
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.classList.add('hidden');
+            setTimeout(() => loadingOverlay.remove(), 500);
+        }
     }
 };
 
