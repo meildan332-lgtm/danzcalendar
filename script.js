@@ -2,6 +2,25 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
 import { getFirestore, collection, doc, getDoc, getDocs, setDoc, deleteDoc, query, orderBy, addDoc, updateDoc, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
+=========================================================================
+// 🔒 [추가된 코드] 사이트 접속 제어 및 즐겨찾기 방지
+// =========================================================================
+const urlParams = new URLSearchParams(window.location.search);
+const secretKey = urlParams.get('key');
+const currentPassword = "1as542fs";  // 방문자용 암호
+const adminPassword = "danz59_nimda"; // 관리자용 암호
+
+if (secretKey !== currentPassword && secretKey !== adminPassword) {
+    alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
+    // 👇 [게시물 링크 등록하는 곳] 아래 주소를 튕겨낼 카페 게시글 링크로 바꿔주세요!
+    window.location.href = "https://cafe.naver.com/flower509"; 
+} else {
+    // 주소창에서 열쇠 숨기기 (깡통 주소만 즐겨찾기 되도록 만듦)
+    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
+    window.history.replaceState({}, document.title, cleanUrl);
+}
+// =========================================================================
+
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyB3afuEn_BsjDFEcgMKEz1AqUTWc0kwF-s",
@@ -1781,7 +1800,7 @@ window.loadUpItems = async function() {
             renderCount++;
             const entry = document.createElement('div');
             entry.style.cssText = "background: #ffffff; border: 2px solid #ffc595; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 30px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; cursor: pointer;";
-            entry.onmouseover = () => entry.style.background = "#F0F4EA"; entry.onmouseout = () => entry.style.background = "#ffffff";
+            entry.onmouseover = () => entry.style.background = "#ffe6d5"; entry.onmouseout = () => entry.style.background = "#ffffff";
             
             // ⭐ 관리자일 경우 우클릭 시 수정 창 열기 이벤트 추가
             if (isAdmin) {
@@ -1906,7 +1925,7 @@ window.checkAndShowPopup = async function() {
                 if (parts.length === 3) deadlineText = `<div style="color: #64748b; font-size: 12px; font-weight: 600; margin-top: 4px;">${parts[1]}.${parts[2]} 마감</div>`;
             }
             listHtml += `
-                <div style="background: #ffffff; border: 2px solid #ffc595; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;" onclick="window.open('${data.link}', '_blank')" onmouseover="this.style.background='#F0F4EA'" onmouseout="this.style.background='#ffffff'">
+                <div style="background: #ffffff; border: 2px solid #ffc595; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s;" onclick="window.open('${data.link}', '_blank')" onmouseover="this.style.background='#ffe6d5'" onmouseout="this.style.background='#ffffff'">
                     <div style="flex: 1;">
                         <div style="font-weight: 800; color: #41522A; font-size: 15px;">${data.title}</div>
                         ${deadlineText}
@@ -1993,7 +2012,7 @@ async function showEntryPopupIfItemsExist() {
             
             const entry = document.createElement('div');
             entry.style.cssText = "background: #ffffff; border: 2px solid #ffc595; border-radius: 20px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;";
-            entry.onmouseover = () => entry.style.background = "#F0F4EA";
+            entry.onmouseover = () => entry.style.background = "#ffe6d5";
             entry.onmouseout = () => entry.style.background = "#ffffff";
             entry.onclick = () => window.open(data.link, '_blank');
             
@@ -2345,11 +2364,14 @@ window.moveMonth = async function(v) {
     if (isMobile) {
         const target = new Date(currentDate);
         const dayNum = target.getDay();
-        const diff = target.getDate() - dayNum; 
-        const sunday = new Date(target.setDate(diff));
+        const diff = target.getDate() - dayNum + (dayNum === 0 ? -6 : 1);
+        const monday = new Date(target.setDate(diff));
+        
         monday.setDate(monday.getDate() + (v * 7));
         currentDate = monday;
-    } else { currentDate.setMonth(currentDate.getMonth() + v); }
+    } else { 
+        currentDate.setMonth(currentDate.getMonth() + v); 
+    }
     
     await ensureMonthsLoadedForDate(currentDate);
     const currentScrollY = window.scrollY;

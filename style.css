@@ -546,6 +546,8 @@ body {
 }
 
 @media screen and (max-width: 1050px) {
+
+    .container::before { display: none !important;}
     .header-center { display: none !important; } 
     .main-header { display: flex !important; flex-direction: column !important; padding: 10px 16px 20px !important; min-height: 0 !important; }
     .header-right { width: 100% !important; padding: 0 !important; justify-content: center !important; }
@@ -571,12 +573,14 @@ body {
     /* 모바일에서는 하단 네비바가 있으므로 헤더 우측의 메모, UP 버튼을 숨깁니다 */
     .header-side-btns { display: none !important; }
 
+    .calendar-top {
+        margin-top: 25px !important; 
+    }
+    
     .week-row {
         background-color: #FFFFFF !important; 
         border-radius: 20px !important; /* 완전한 알약 모양 */
-        border: 2px solid #ffc595  !important;
-        box-shadow: 0 0 0 3px #ffc595 !important;
-        margin-bottom: 3px !important; /* 그림자가 잘리지 않도록 여백 확보 */
+        border: 2px solid #a03e01  !important;
     }
 
     .week-row.today {
@@ -587,7 +591,6 @@ body {
     .week-row.today-row {
         background-color: #FFFFFF !important; 
         border: 2px solid #ffc595  !important;
-        box-shadow: 0 0 0 3px #ffc595 !important;
     }
     
     .week-row .week-day-label {
@@ -674,6 +677,12 @@ body {
         height: 85vh !important; 
         max-height: none !important;
     }
+    
+    #dayInfoModal #dayInfoTitle {
+        font-size: 22px !important; /* 기존 34px -> 22px로 축소 (숫자를 바꿔 원하는 크기로 조절 가능) */
+        margin-bottom: 15px !important; /* 글씨가 작아진 만큼 아래 여백도 살짝 줄임 */
+    }
+
     .memo-panel-container.open { width: 100%; padding-left: 0; height: auto; max-height: none; }
     .memo-panel-header { flex-direction: column; align-items: stretch; gap: 12px; }
     .memo-tab:last-child { margin-right: 0; }
@@ -842,7 +851,7 @@ body {
 .right-sidebar { display: none; }
 
 .empty-event-card {
-    border: 2px dashed darkolivegreen !important; background: transparent !important; border-radius: 25px !important;
+    border: 2px dashed rgb(107, 66, 47) !important; background: transparent !important; border-radius: 25px !important;
     padding: 14px 16px !important; color: #A09586 !important; font-weight: 800 !important;
     padding: 14px 16px !important; color: #A09586 !important; font-weight: normal !important;
     font-size: 0.95rem !important; text-align: center !important; min-height: 48px !important;
@@ -940,6 +949,7 @@ body {
         max-width: 100% !important;
         margin-top: 15px !important;
     }
+    
 }
 
 /* =========================================
@@ -1063,29 +1073,6 @@ body.admin-mode #adminBtn .login-text {
     /* 기존 카드 배경색과 형태는 그대로 유지합니다 */
 }
 
-/* 카드 내부에 이미지 배치
-.event-tag.type-휴방::before {
-    content: "";
-    position: absolute;
-    top: 0; bottom: 0; left: 0; right: 0; 
-    background-image: url('https://i.postimg.cc/9Qg9H0w5/original-24-cutout.png');
-    
-    background-size: contain; 
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    opacity: 0.6; /* 투명도 조절 (0.1 ~ 1) */
-/*    z-index: 1;
-    border-radius: inherit;
-}*/
-
-/* 기존 텍스트(시간, 제목)만 투명하게 숨기기 (카드 크기는 유지)
-.event-tag.type-휴방 > * {
-    opacity: 0 !important; 
-    pointer-events: none !important;
-}*/
-
-
 
 /* =========================================
    일정 카드 내부 폰트 변경 (OngleebDaisy)
@@ -1176,4 +1163,121 @@ body.admin-mode #adminBtn .login-text {
     border-radius: 12px !important;
 }
 
+/* =========================================
+   📱 모바일 환경 (1050px 이하) 하단바 변환
+   ========================================= */
+@media screen and (max-width: 1050px) {
 
+    .event-tag div {
+        font-size: 16px !important; /* 기존 20px -> 15px로 축소 */
+    }
+    
+    /* 2. 달력 안의 일정 카드 시간 표시 크기 줄이기 */
+    .event-time-badge,
+    .week-row .event-tag .event-time-badge {
+        font-size: 14px !important; /* 기존 14px -> 12px로 축소 */
+    }
+    
+    /* 1. 기존 별도 하단바 숨김 (우측 버튼을 하단바로 대체) */
+    .mobile-bottom-nav { 
+        display: none !important; 
+    }
+
+    /* 2. 우측 책갈피 컨테이너를 모바일 하단 고정 바(Bar)로 변경 */
+    .header-side-btns.right-side {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        position: fixed !important;
+        top: auto !important;
+        bottom: 20px !important;
+        left: 20px !important;
+        right: 20px !important;
+        width: auto !important;
+        height: 65px !important;
+        padding: 0 10px !important;
+        margin: 0 !important;
+        background-color: #ffffff !important;
+        border-radius: 30px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+        transform: none !important;
+        z-index: 9999 !important;
+        gap: 0 !important;
+    }
+
+    /* 3. 하단바 내부 개별 버튼 스타일 */
+    .header-side-btns.right-side .side-btn {
+        display: flex !important;
+        flex: 1 !important;
+        width: auto !important;
+        min-width: auto !important;
+        height: 100% !important;
+        border-radius: 30px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding: 0 !important;
+        color: #A09586 !important;
+        font-size: 10px !important; 
+        font-weight: 800 !important;
+        pointer-events: auto !important;
+    }
+
+    /* 🚫 모바일에서는 멤버, 로그인 버튼 완전히 숨김 */
+    .header-side-btns.right-side #memberManagerBtn_pc,
+    .header-side-btns.right-side #adminBtn {
+        display: none !important;
+    }
+
+    /* 4. 아이콘 절대 찌그러짐 방지 & 크기 강력 축소 (18px) */
+    .header-side-btns.right-side .side-btn svg,
+    .header-side-btns.right-side .side-btn img:not(.soop-color-logo) {
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        min-height: 18px !important;
+        max-width: 18px !important;
+        max-height: 18px !important;
+        flex-shrink: 0 !important;
+        object-fit: contain !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* 5. 숲(SOOP) 로고 모바일 맞춤 강력 축소 (16px) */
+    .header-side-btns.right-side .side-btn .soop-color-logo {
+        width: auto !important;
+        height: 16px !important;
+        min-height: 16px !important;
+        max-height: 16px !important;
+        flex-shrink: 0 !important;
+        filter: grayscale(100%) opacity(60%) !important;
+        margin-bottom: 4px !important;
+    }
+
+    /* 버튼 안의 글씨 줄바꿈 및 찌그러짐 방지 */
+    .header-side-btns.right-side .side-btn span {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+    }
+
+    /* 6. 터치 및 활성화 시 효과 */
+    .header-side-btns.right-side .side-btn:hover,
+    .header-side-btns.right-side .side-btn:active,
+    .header-side-btns.right-side .side-btn.board-active {
+        background: transparent !important;
+        color: #ffc595 !important;
+        transform: none !important;
+    }
+
+    /* 버튼 활성화 시 숲 로고 색상 복원 */
+    .header-side-btns.right-side .side-btn:hover .soop-color-logo,
+    .header-side-btns.right-side .side-btn.board-active .soop-color-logo {
+        filter: none !important;
+        opacity: 1 !important;
+    }
+}
