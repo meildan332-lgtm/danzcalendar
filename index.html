@@ -71,10 +71,11 @@
         if (secretKey !== currentPassword && secretKey !== adminPassword) {
             alert("잘못된 접근입니다. 단즈님 팬카페를 통해 접속해 주세요.");
             window.location.href = "https://cafe.naver.com/flower509";
-
-            throw new Error("Unauthorized");
+            
+            // 인증 실패 시 나머지 코드 실행을 강제로 중단합니다
+            throw new Error("Unauthorized Access");
         } else {
-            // 키 값이 맞을 때만 실행되도록 로직을 분리
+            // 인증 성공 시 주소창에서 키 값을 제거하여 깔끔하게 만듭니다[cite: 1]
             const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
             window.history.replaceState({}, document.title, cleanUrl);
         }
