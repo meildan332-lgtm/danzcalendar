@@ -1900,11 +1900,16 @@ window.checkAndShowPopup = async function() {
         const existingModal = document.getElementById('upPopupModal');
         if (existingModal) existingModal.remove();
 
-        let listHtml = `<div style="font-family: 'TMoneyDungunbaram', sans-serif; font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffc595;">📌UP눌러주세요</div>`;
+        let listHtml = ''; // 1. 처음엔 아무것도 없는 빈 상태로 시작합니다.
 
+        // 2. 이미지가 있다면 가장 먼저(위에) 배치합니다.
         if (popupImageUrl) {
-            // max-height와 object-fit을 지우고 height: auto; 추가
             listHtml += `<img src="${popupImageUrl}" style="width: 100%; height: auto; border-radius: 20px; margin-bottom: 15px; border: 2px solid #ffc595;">`;
+        }
+
+        // 3. 진행 중인 UP 항목이 1개라도 있을 때만 텍스트를 띄웁니다.
+        if (validItems.length > 0) {
+            listHtml += `<div style="font-family: 'TMoneyDungunbaram', sans-serif; font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffc595;">📌UP눌러주세요</div>`;
         }
 
         validItems.forEach(data => {
