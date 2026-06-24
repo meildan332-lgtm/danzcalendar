@@ -2099,6 +2099,11 @@ window.showAdminMenu = function(e) {
         btnManagePopup.onmouseover = () => btnManagePopup.style.background = '#F0F4EA'; btnManagePopup.onmouseout = () => btnManagePopup.style.background = 'none';
         btnManagePopup.onclick = () => { menu.style.display = 'none'; window.openPopupManagerModal(); };
 
+        const btnMember = document.createElement('button');
+        btnMember.innerText = '멤버 관리';
+        btnMember.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
+        btnMember.onclick = () => { menu.style.display = 'none'; window.openMemberManager(); };
+        
         const btnLogout = document.createElement('button');
         btnLogout.innerText = '로그아웃';
         btnLogout.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; color:#ef4444; font-size:14px; font-family: "TMoneyDungunbaram";';
