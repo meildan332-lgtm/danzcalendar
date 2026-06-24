@@ -266,14 +266,6 @@ body {
     border-radius: 30px !important;
 }
 
-.container {
-    background-color: #ffffff !important;
-    border: 3px solid #a03e01 !important;
-    /* 흰색 그림자가 15px만큼 뻗어나가고, 고동색 그림자가 17px(흰색보다 2px 더) 뻗어나갑니다 */
-    box-shadow: 0 0 0 25px #ffe6d5, 0 0 0 27px #a03e01 !important;
-    margin-top: -50px !important;
-}
-
 /* 5. 모바일 환경에서 달력 요일 라벨 둥글기 맞춤 */
 @media screen and (max-width: 1050px) {
     .week-row.today-row .week-day-label {
