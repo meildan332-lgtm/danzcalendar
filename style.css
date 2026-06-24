@@ -183,7 +183,7 @@ body {
 
 .container {
     width: 90%; max-width: 1600px; background: var(--white); border-radius: 20px; 
-    padding: 35px; box-sizing: border-box; position: relative; display: flex; flex-direction: column;
+    padding: 35px; box-sizing: border-box; position: relative; display: flex; flex-direction: column; margin-top: -50px !important;
 }
 
 .calendar-top { display: flex; justify-content: center; align-items: center; margin-bottom: 5px; width: 100%; }
@@ -265,6 +265,7 @@ body {
 .modal-content {
     border-radius: 30px !important;
 }
+
 
 /* 5. 모바일 환경에서 달력 요일 라벨 둥글기 맞춤 */
 @media screen and (max-width: 1050px) {
