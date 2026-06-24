@@ -2097,14 +2097,14 @@ window.showAdminMenu = function(e) {
     // 1. 멤버 관리 버튼 추가
     const btnMember = document.createElement('button');
     btnMember.innerText = '멤버 관리';
-    btnMember.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
+    btnMember.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; font-family: "TMoneyDungunbaram";';
     btnMember.onclick = () => { menu.style.display = 'none'; window.openMemberManager(); };
     menu.appendChild(btnMember);
 
     // 2. 팝업 관리 버튼
     const btnManagePopup = document.createElement('button');
     btnManagePopup.innerText = '팝업 관리';
-    btnManagePopup.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
+    btnManagePopup.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; font-family: "TMoneyDungunbaram";';
     btnManagePopup.onclick = () => { menu.style.display = 'none'; window.openPopupManagerModal(); };
     menu.appendChild(btnManagePopup);
 
