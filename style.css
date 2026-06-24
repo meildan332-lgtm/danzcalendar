@@ -409,7 +409,7 @@ body {
 
 .type-개인방송 { background-color:#ffc595 !important; color: #8b4811 !important; } /* 연한 분홍 배경 */
 .type-합방 { background-color: #ffe6f0 !important; color: #8c1b4f !important; } /* 베이지 배경 + 진한 분홍 텍스트 */
-.type-휴방 { background-color: #d1d1d1 !important; color: #575757 !important; }
+.type-휴방 { background-color: #e2e2e2 !important; color: #7c7c7c !important; }
 .type-시네티 { background-color: #c8e6b0 !important; color: #477422 !important; }
 .type-LCK { background-color: #c8e6b0 !important; color: #477422 !important; }
 .event-modal-box { max-width: 850px; width: 95%; }
@@ -739,7 +739,7 @@ body {
 
     .week-row.today-row .event-tag.type-개인방송 { background-color:#ffc595 !important; color: #8b4811 !important; }
     .week-row.today-row .event-tag.type-합방 { background-color: #ffe6f0 !important; color: #8c1b4f !important; }
-    .week-row.today-row .event-tag.type-휴방 { background-color: #d1d1d1 !important; color: #464646 !important; }
+    .week-row.today-row .event-tag.type-휴방 { background-color: #e2e2e2 !important; color: #7c7c7c !important; }
     .week-row.today-row .event-tag.type-시네티 { background-color: #c8e6b0 !important; color: #477422 !important; }
     .week-row.today-row .event-tag.type-LCK { background-color: #c8e6b0 !important; color: #477422 !important; }
     .week-row.today-row .event-tag { border: none !important; }
@@ -1148,7 +1148,7 @@ body.admin-mode #adminBtn .login-text {
 /* 3. 각 유형별 캘린더 배경색과 똑같은 색상으로 점 색상 지정 */
 .summary-item.type-개인방송::before { background-color: #ffc595 !important; }
 .summary-item.type-합방::before { background-color: #ffe6f0 !important; }
-.summary-item.type-휴방::before { background-color: #d1d1d1 !important; }
+.summary-item.type-휴방::before { background-color: #e2e2e2 !important; }
 .summary-item.type-시네티::before { background-color: #c8e6b0 !important; }
 .summary-item.type-LCK::before { background-color: #c8e6b0 !important; }
 
