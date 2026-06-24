@@ -1870,13 +1870,6 @@ window.checkAndShowPopup = async function() {
             validItems.push({ id: docSnap.id, source: 'up', ...data });
         });
 
-        if (validItems.length === 0) {
-            if (isAdmin) {
-                try { await deleteDoc(doc(db, 'settings', 'up_popup')); } catch(e) {}
-            }
-            return; 
-        }
-
         validItems.sort((a, b) => {
             if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
             return (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0);
@@ -1886,9 +1879,23 @@ window.checkAndShowPopup = async function() {
         try {
             const imgSnap = await getDoc(doc(db, 'settings', 'up_popup'));
             if (imgSnap.exists() && imgSnap.data().imageUrl) {
-                popupImageUrl = imgSnap.data().imageUrl;
+                const imgData = imgSnap.data();
+                
+                // 👇 팝업 이미지 전용 마감 기한 체크
+                if (imgData.deadline && imgData.deadline < todayStr) {
+                    if (isAdmin) {
+                        try { await deleteDoc(doc(db, 'settings', 'up_popup')); } catch(e) {} // 기한 지나면 자동 삭제
+                    }
+                } else {
+                    popupImageUrl = imgData.imageUrl;
+                }
             }
         } catch(e) {}
+
+        // 👇 UP 항목도 없고 이미지도 마감되었거나 없을 때만 팝업을 안 띄움
+        if (validItems.length === 0 && !popupImageUrl) {
+            return; 
+        }
 
         const existingModal = document.getElementById('upPopupModal');
         if (existingModal) existingModal.remove();
@@ -2156,6 +2163,12 @@ function ensurePopupManagerModal() {
                 <label style="font-weight:bold; color:#7A5A2F; font-size:14px;">2. 또는 이미지 링크(URL) 입력</label>
                 <input type="text" id="popupImgLink" placeholder="https://..." style="padding:12px; border:1px solid #ddd; border-radius:30px; font-weight:bold; outline:none; font-size:13px;" oninput="document.getElementById('popupImgPreview').src=this.value; document.getElementById('popupImgPreview').style.display='block'; document.getElementById('popupImgPlaceholder').style.display='none';">
             </div>
+
+            <!-- 👇 마감 기한 입력칸 추가 👇 -->
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top: 5px;">
+                <label style="font-weight:bold; color:#7A5A2F; font-size:14px;">3. 마감 기한 (이 날짜가 지나면 이미지가 내려갑니다)</label>
+                <input type="date" id="popupImgDeadline" style="padding:12px; border:1px solid #ddd; border-radius:30px; font-weight:bold; outline:none; font-size:13px;">
+            </div>
             
             <div style="display:flex; gap:10px; margin-top:10px;">
                 <button onclick="window.deletePopupImage()" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#fee2e2; color:#ef4444; font-weight:bold; font-size:15px;">이미지 삭제</button>
@@ -2173,10 +2186,12 @@ window.openPopupManagerModal = async function() {
     const preview = document.getElementById('popupImgPreview');
     const placeholder = document.getElementById('popupImgPlaceholder');
     const linkInput = document.getElementById('popupImgLink');
+    const deadlineInput = document.getElementById('popupImgDeadline'); // 추가
     
     preview.style.display = 'none';
     placeholder.style.display = 'block';
     linkInput.value = '';
+    deadlineInput.value = ''; // 초기화 추가
     
     try {
         const snap = await getDoc(doc(db, 'settings', 'up_popup'));
@@ -2185,6 +2200,7 @@ window.openPopupManagerModal = async function() {
             linkInput.value = snap.data().imageUrl;
             preview.style.display = 'block';
             placeholder.style.display = 'none';
+            if (snap.data().deadline) deadlineInput.value = snap.data().deadline; // 마감일 불러오기
         }
     } catch (e) { console.error(e); }
     
@@ -2216,11 +2232,13 @@ window.uploadPopupManagerImg = async function(input) {
 window.savePopupImage = async function() {
     if (!isAdmin) return;
     const link = document.getElementById('popupImgLink').value.trim();
+    const deadline = document.getElementById('popupImgDeadline').value; // 마감일 가져오기
     const btn = document.getElementById('popupSaveBtn');
     btn.innerText = '저장 중...';
     try {
         if (link) {
-            await setDoc(doc(db, 'settings', 'up_popup'), { imageUrl: link, updatedAt: new Date() });
+            // 마감일도 함께 저장
+            await setDoc(doc(db, 'settings', 'up_popup'), { imageUrl: link, deadline: deadline, updatedAt: new Date() });
         } else {
             await deleteDoc(doc(db, 'settings', 'up_popup'));
         }
