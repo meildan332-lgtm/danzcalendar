@@ -1896,7 +1896,8 @@ window.checkAndShowPopup = async function() {
         let listHtml = `<div style="font-family: 'TMoneyDungunbaram', sans-serif; font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #ffc595;">📌UP눌러주세요</div>`;
 
         if (popupImageUrl) {
-            listHtml += `<img src="${popupImageUrl}" style="width: 100%; border-radius: 20px; margin-bottom: 15px; max-height: 250px; object-fit: cover; border: 2px solid #ffc595;">`;
+            // max-height와 object-fit을 지우고 height: auto; 추가
+            listHtml += `<img src="${popupImageUrl}" style="width: 100%; height: auto; border-radius: 20px; margin-bottom: 15px; border: 2px solid #ffc595;">`;
         }
 
         validItems.forEach(data => {
