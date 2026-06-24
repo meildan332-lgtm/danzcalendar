@@ -2083,65 +2083,52 @@ async function showEntryPopupIfItemsExist() {
 // 기존 showAdminMenu 함수를 이걸로 통째로 교체해주세요!
 window.showAdminMenu = function(e) {
     if (e) { e.preventDefault(); e.stopPropagation(); }
-    let menu = document.getElementById('dynamicAdminMenu');
+    
+    // 기존 메뉴가 있다면 삭제하고 다시 생성 (수정 사항 반영용)
+    const existingMenu = document.getElementById('dynamicAdminMenu');
+    if (existingMenu) existingMenu.remove();
+
+    const menu = document.createElement('div');
+    menu.id = 'dynamicAdminMenu';
+    menu.style.cssText = 'position:fixed; background:white; border:2px solid #e2e8f0; border-radius:30px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:9999; display:flex; flex-direction:column; padding:8px; gap:4px; min-width:140px;';
+    
+    // 1. 멤버 관리 버튼 추가
+    const btnMember = document.createElement('button');
+    btnMember.innerText = '멤버 관리';
+    btnMember.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
+    btnMember.onclick = () => { menu.style.display = 'none'; window.openMemberManager(); };
+    menu.appendChild(btnMember);
+
+    // 2. 팝업 관리 버튼
+    const btnManagePopup = document.createElement('button');
+    btnManagePopup.innerText = '팝업 관리';
+    btnManagePopup.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
+    btnManagePopup.onclick = () => { menu.style.display = 'none'; window.openPopupManagerModal(); };
+    menu.appendChild(btnManagePopup);
+
+    // 3. 로그아웃 버튼
+    const btnLogout = document.createElement('button');
+    btnLogout.innerText = '로그아웃';
+    btnLogout.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; color:#ef4444; font-size:14px; font-family: "TMoneyDungunbaram";';
+    btnLogout.onclick = async () => { 
+        menu.style.display = 'none'; 
+        // ... (기존 로그아웃 로직)
+        isAdmin = false;
+        currentAdminProfile = null;
+        sessionStorage.removeItem('sompunch_admin_session'); 
+        localStorage.removeItem('sompunch_admin_session');
+        updateAdminUI(); 
+        renderCalendar(); 
+        showToast('로그아웃 되었습니다.');
+    };
+    menu.appendChild(btnLogout); 
+    
+    document.body.appendChild(menu);
+    
     const targetBtn = e.currentTarget || document.getElementById('adminBtn');
     const rect = targetBtn.getBoundingClientRect();
-
-    if (!menu) {
-        menu = document.createElement('div');
-        menu.id = 'dynamicAdminMenu';
-        menu.style.cssText = 'position:fixed; background:white; border:2px solid #e2e8f0; border-radius:30px; box-shadow:0 4px 12px rgba(0,0,0,0.1); z-index:9999; display:flex; flex-direction:column; padding:8px; gap:4px; min-width:140px;';
-        
-        // 👇 새로 추가된 "팝업 관리" 메뉴 버튼
-        const btnManagePopup = document.createElement('button');
-        btnManagePopup.innerText = '팝업 관리';
-        btnManagePopup.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
-        btnManagePopup.onmouseover = () => btnManagePopup.style.background = '#F0F4EA'; btnManagePopup.onmouseout = () => btnManagePopup.style.background = 'none';
-        btnManagePopup.onclick = () => { menu.style.display = 'none'; window.openPopupManagerModal(); };
-
-        const btnMember = document.createElement('button');
-        btnMember.innerText = '멤버 관리';
-        btnMember.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; font-size:14px; color:#ffc595; font-family: "TMoneyDungunbaram";';
-        btnMember.onclick = () => { menu.style.display = 'none'; window.openMemberManager(); };
-        
-        const btnLogout = document.createElement('button');
-        btnLogout.innerText = '로그아웃';
-        btnLogout.style.cssText = 'padding:10px 16px; border:none; background:none; text-align:left; cursor:pointer; font-weight:bold; border-radius:30px; color:#ef4444; font-size:14px; font-family: "TMoneyDungunbaram";';
-        btnLogout.onmouseover = () => btnLogout.style.background = '#fef2f2'; btnLogout.onmouseout = () => btnLogout.style.background = 'none';
-        btnLogout.onclick = async () => { 
-            menu.style.display = 'none'; 
-            if (modifiedDates.size > 0) { if (confirm("순서 변경 사항이 있습니다. 저장하시겠습니까?")) await saveAllModifiedOrders(); }
-            
-            isAdmin = false;
-            currentAdminProfile = null;
-            
-            sessionStorage.removeItem('sompunch_admin_session'); 
-            localStorage.removeItem('sompunch_admin_session');
-            
-            modifiedDates.clear(); 
-            updateAdminUI(); 
-            renderCalendar(); 
-            showToast('로그아웃 되었습니다.');
-        };
-        
-        // 암호 변경 버튼(btnChangePw) 제거됨
-        menu.appendChild(btnManagePopup); // 메뉴에 팝업 관리 추가
-        menu.appendChild(btnLogout); 
-        document.body.appendChild(menu);
-    }
-    
     menu.style.top = (rect.bottom + 8) + 'px';
     menu.style.right = (window.innerWidth - rect.right) + 'px';
-    
-    if (menu.style.display === 'none' || menu.style.display === '') {
-        menu.style.display = 'flex';
-        setTimeout(() => {
-            const closeMenu = (evt) => {
-                if (!menu.contains(evt.target)) { menu.style.display = 'none'; document.removeEventListener('click', closeMenu); }
-            };
-            document.addEventListener('click', closeMenu);
-        }, 0);
-    } else { menu.style.display = 'none'; }
 };
 
 // ==========================================
