@@ -2732,7 +2732,7 @@ async function initApp() {
     });
 
     // 🌟 로딩이 모두 완료되고, 화면이 보일 준비가 되었을 때 팝업을 띄웁니다!
-    await showEntryPopupIfItemsExist();
+    await checkAndShowPopup();
 }
 
 window.addEventListener('unhandledrejection', (event) => {
