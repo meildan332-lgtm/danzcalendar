@@ -1938,40 +1938,63 @@ window.checkAndShowPopup = async function() {
 };
 
 // 업링크 데이터 로드 및 팝업 표시
-async function showEntryPopupIfItemsExist() {
-    console.log("1. 팝업 함수 진입 성공!");
+window.closeEntryPopup = function() {
+    const isChecked = document.getElementById('hideEntryPopupToday')?.checked;
+    if (isChecked) {
+        const today = new Date().toDateString();
+        localStorage.setItem('hideUpPopupDate', today);
+    }
+    const modal = document.getElementById('entryPopupModal');
+    if (modal) modal.style.display = 'none';
+};
 
-    const today = new Date();
-    const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-    
+async function showEntryPopupIfItemsExist() {
+    console.log("1. 팝업 함수 진입");
+
+    // 1. '오늘 하루 안 보기' 상태 확인
+    const hideDate = localStorage.getItem('hideUpPopupDate');
+    const todayString = new Date().toDateString();
+    if (hideDate === todayString) {
+        console.log("2. ⛔ 오늘 하루 안보기 설정됨 - 팝업을 띄우지 않습니다. (테스트하려면 시크릿 모드나 로컬스토리지 삭제 필요)");
+        return;
+    }
+
     try {
+        // 2. UP 데이터만 먼저 안전하게 로드 (권한 에러 방지)
         const [uplinkSnapshot, upSnapshot] = await Promise.all([
             getDocs(collection(db, 'uplink')),
             getDocs(collection(db, 'up'))
         ]);
         
-        if (uplinkSnapshot.empty && upSnapshot.empty) {
-            console.log("3. DB에 등록된 UP 항목이 아예 없습니다.");
-            return;
-        }
-
         let items = [];
         uplinkSnapshot.forEach(docSnap => { items.push({ id: docSnap.id, source: 'uplink', ...docSnap.data() }); });
         upSnapshot.forEach(docSnap => { items.push({ id: docSnap.id, source: 'up', ...docSnap.data() }); });
         
+        // 마감일 필터링
         const todayLocal = new Date();
         todayLocal.setHours(0, 0, 0, 0);
         const todayFormatted = `${todayLocal.getFullYear()}-${String(todayLocal.getMonth() + 1).padStart(2, '0')}-${String(todayLocal.getDate()).padStart(2, '0')}`;
         
         items = items.filter(data => !(data.deadline && data.deadline < todayFormatted));
+        console.log(`3. 📌 마감 안 된 UP 항목 개수: ${items.length}개`);
         
-        console.log(`4. 마감 안 된 UP 항목 개수: ${items.length}개`);
-        
-        if (items.length === 0) {
-            console.log("5. 띄울 항목이 없어서 종료합니다.");
+        // 3. 팝업 이미지는 에러가 나도 문제없도록 별도 try-catch로 로드
+        let popupImageUrl = '';
+        try {
+            const imgSnap = await getDoc(doc(db, 'settings', 'up_popup'));
+            if (imgSnap.exists() && imgSnap.data().imageUrl) {
+                popupImageUrl = imgSnap.data().imageUrl;
+            }
+        } catch (imgError) {
+            console.warn("⚠️ 팝업 이미지 로드 실패 (권한 없음 또는 문서 없음. 정상일 수 있음):", imgError);
+        }
+
+        if (items.length === 0 && !popupImageUrl) {
+            console.log("4. 띄울 항목과 이미지가 모두 없어서 팝업을 종료합니다.");
             return; 
         }
 
+        // 4. 정렬
         items.sort((a, b) => {
             if(a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
             return (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0);
@@ -1979,46 +2002,65 @@ async function showEntryPopupIfItemsExist() {
 
         const list = document.getElementById('entryPopupList');
         if (!list) {
-            console.error("6. 에러! HTML에 entryPopupList 아이디가 없습니다. index.html을 확인해주세요.");
+            console.error("❌ 에러! HTML에 entryPopupList 아이디가 없습니다.");
             return;
         }
         list.innerHTML = '';
         
-        items.forEach(data => {
-            let deadlineText = '';
-            if (data.deadline) {
-                const parts = data.deadline.split('-');
-                if (parts.length === 3) deadlineText = `<div style="color: #64748b; font-size: 11px; font-weight: 600; margin-top: 4px; font-family: 'TMoneyDungunbaram', sans-serif;">${parts[1]}.${parts[2]} 마감</div>`;
-            }
-            
-            const entry = document.createElement('div');
-            entry.style.cssText = "background: #ffffff; border: 2px solid #ffc595; border-radius: 20px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s;";
-            entry.onmouseover = () => entry.style.background = "#ffe6d5";
-            entry.onmouseout = () => entry.style.background = "#ffffff";
-            entry.onclick = () => window.open(data.link, '_blank');
-            
-            entry.innerHTML = `
-                <div style="flex: 1;">
-                    <div style="font-weight: 800; color: #1e293b; font-size: 15px; font-family: 'TMoneyDungunbaram', sans-serif;">${data.title}</div>
-                    ${deadlineText}
-                </div>
-                <div style="color: #ffc595;">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
-                </div>
-            `;
-            list.appendChild(entry);
-        });
+        // 5. 이미지 렌더링
+        if (popupImageUrl) {
+            list.innerHTML += `<img src="${popupImageUrl}" style="width: 100%; border-radius: 20px; margin-bottom: 15px; max-height: 250px; object-fit: cover; border: 2px solid #ffc595;">`;
+        }
+
+        // 6. 항목 렌더링
+        if (items.length > 0) {
+            list.innerHTML += `<div style="font-family: 'TMoneyDungunbaram', sans-serif; font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 15px; color: #ffc595;">📌UP눌러주세요</div>`;
+            items.forEach(data => {
+                let deadlineText = '';
+                if (data.deadline) {
+                    const parts = data.deadline.split('-');
+                    if (parts.length === 3) deadlineText = `<div style="color: #64748b; font-size: 11px; font-weight: 600; margin-top: 4px; font-family: 'TMoneyDungunbaram', sans-serif;">${parts[1]}.${parts[2]} 마감</div>`;
+                }
+                
+                const entry = document.createElement('div');
+                entry.style.cssText = "background: #ffffff; border: 2px solid #ffc595; border-radius: 20px; padding: 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; margin-bottom: 10px;";
+                entry.onmouseover = () => entry.style.background = "#ffe6d5";
+                entry.onmouseout = () => entry.style.background = "#ffffff";
+                entry.onclick = () => window.open(data.link, '_blank');
+                
+                entry.innerHTML = `
+                    <div style="flex: 1;">
+                        <div style="font-weight: 800; color: #1e293b; font-size: 15px; font-family: 'TMoneyDungunbaram', sans-serif;">${data.title}</div>
+                        ${deadlineText}
+                    </div>
+                    <div style="color: #ffc595;">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+                    </div>
+                `;
+                list.appendChild(entry);
+            });
+        }
 
         const modal = document.getElementById('entryPopupModal');
         if (modal) {
-            modal.style.display = 'flex';
-            console.log("7. 팝업 띄우기 성공!");
-        } else {
-            console.error("7. 에러! HTML에 entryPopupModal 아이디가 없습니다.");
+            const footer = modal.querySelector('div[style*="border-top"]');
+            if (footer && !footer.querySelector('#hideEntryPopupToday')) {
+                footer.style.display = 'flex';
+                footer.style.justifyContent = 'space-between';
+                footer.style.alignItems = 'center';
+                footer.innerHTML = `
+                    <label style="font-size: 14px; color: #64748b; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <input type="checkbox" id="hideEntryPopupToday" style="accent-color: #ffc595; width: 16px; height: 16px; cursor: pointer;">오늘 하루 안 보기
+                    </label>
+                    <button style="padding: 10px 24px; font-size: 15px; background: #ffc595; color: white; border: none; border-radius: 30px; font-weight: 800; cursor: pointer;" onclick="closeEntryPopup()">닫기</button>
+                `;
+            }
+            modal.style.setProperty('display', 'flex', 'important');
+            console.log("5. 🎉 팝업 화면에 띄우기 완료!");
         }
         
     } catch (error) {
-        console.error("팝업 데이터 로딩 에러:", error);
+        console.error("❌ 팝업 데이터 로딩 치명적 에러:", error);
     }
 }
 
@@ -2641,9 +2683,6 @@ document.addEventListener('dragstart', function(e) {
 });
 
 async function initApp() {
-    console.log("팝업 호출 직전");
-await showEntryPopupIfItemsExist();
-
     const loadingOverlay = document.getElementById('loadingOverlay');
 
     try {
@@ -2653,12 +2692,12 @@ await showEntryPopupIfItemsExist();
         updateAdminUI();
 
         await window.showTab('schedule');
-        await showEntryPopupIfItemsExist();
 
     } catch (error) {
         console.error('초기 로딩 중 오류 발생:', error);
 
     } finally {
+        // 이 코드가 실행되어야 투명 로딩막이 사라집니다.
         document.body.classList.remove('is-loading');
 
         if (loadingOverlay) {
@@ -2670,13 +2709,11 @@ await showEntryPopupIfItemsExist();
     }
 
     const btnMin = document.getElementById('btnMin');
-
     if (btnMin) {
         btnMin.innerHTML = `...`;
     }
 
     const loginBtns = document.querySelectorAll('#adminBtn, #adminBtn_pc');
-
     loginBtns.forEach(btn => {
         btn.onclick = (e) => {
             window.promptAdmin(e);
@@ -2684,7 +2721,6 @@ await showEntryPopupIfItemsExist();
     });
 
     let lastWidth = window.innerWidth;
-
     window.addEventListener('resize', () => {
         if (window.innerWidth !== lastWidth) {
             lastWidth = window.innerWidth;
@@ -2692,6 +2728,7 @@ await showEntryPopupIfItemsExist();
         }
     });
 
+    // 🌟 로딩이 모두 완료되고, 화면이 보일 준비가 되었을 때 팝업을 띄웁니다!
     await showEntryPopupIfItemsExist();
 }
 
