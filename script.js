@@ -2056,6 +2056,9 @@ async function showEntryPopupIfItemsExist() {
                 `;
             }
             modal.style.setProperty('display', 'flex', 'important');
+            // 👇 어떤 숨김 속성이 방해하더라도 강제로 뚫고 나오게 무조건 보이게 설정
+            modal.style.setProperty('visibility', 'visible', 'important');
+            modal.style.setProperty('opacity', '1', 'important');
             console.log("5. 🎉 팝업 화면에 띄우기 완료!");
         }
         

@@ -2,31 +2,31 @@
 <html lang="ko">
 <head>
     <script>
-        (function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const key = urlParams.get('key');
-            const cafeUrl = "https://cafe.naver.com/flower509";
-            
-            // 1. 세션 스토리지에서 인증 여부 확인 (탭을 닫으면 사라짐)
-            const isVerified = sessionStorage.getItem('danz_auth') === 'true';
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const key = urlParams.get('key');
+        const cafeUrl = "https://cafe.naver.com/flower509";
+        
+        // 1. 세션 스토리지에서 인증 여부 확인 (탭을 닫으면 사라짐)
+        const isVerified = sessionStorage.getItem('danz_auth') === 'true';
 
-            // 2. 키가 있거나 이미 세션 인증이 된 경우
-            if (key === "1as542fs" || key === "danz59_nimda") {
-                sessionStorage.setItem('danz_auth', 'true'); // 세션에 인증 저장
-            } else if (!isVerified) {
-                // 키도 없고 세션 기록도 없으면 카페로 이동
-                alert("일정 확인을 위해 단즈님 팬카페를 통해 접속해 주세요.");
-                window.location.replace(cafeUrl);
-                return;
-            }
+        // 2. 키가 있거나 이미 세션 인증이 된 경우
+        if (key === "1as542fs" || key === "danz59_nimda") {
+            sessionStorage.setItem('danz_auth', 'true'); // 세션에 인증 저장
+        } else if (!isVerified) {
+            // 키도 없고 세션 기록도 없으면 카페로 이동
+            alert("일정 확인을 위해 단즈님 팬카페를 통해 접속해 주세요.");
+            window.location.replace(cafeUrl);
+            return;
+        }
 
-            // 3. 인증 성공 시 주소창 깔끔하게 정리
-            if (window.history.replaceState) {
-                const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                window.history.replaceState({}, document.title, cleanUrl);
-            }
-        })();
-    </script>
+        // 3. 인증 성공 시 주소창 깔끔하게 정리
+        if (window.history.replaceState) {
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+        }
+    })();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DANZ</title>
@@ -354,15 +354,16 @@
             <span>메모</span>
         </button>
     </nav>
-<div id="entryPopupModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:100000; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
-    <div style="background:#fff; width:90%; max-width:450px; padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.2); display:flex; flex-direction:column; max-height: 80vh;">
-        <div id="entryPopupList" style="overflow-y:auto; flex:1; padding-right:5px; margin-bottom: 15px; display:flex; flex-direction:column; gap: 10px;">
+
+    <div id="entryPopupModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); z-index:9999999; justify-content:center; align-items:center; backdrop-filter:blur(4px);">
+        <div style="background:#fff; width:90%; max-width:450px; padding:30px; border-radius:30px; box-shadow:0 10px 25px rgba(0,0,0,0.2); display:flex; flex-direction:column; max-height: 80vh;">
+            <div id="entryPopupList" style="overflow-y:auto; flex:1; padding-right:5px; margin-bottom: 15px; display:flex; flex-direction:column; gap: 10px;">
+                </div>
+            <div style="text-align: center; padding-top: 15px; border-top: 1px dashed #e2e8f0; flex-shrink:0;">
+                <button style="padding: 10px 24px; font-size: 15px; background: #ffc595; color: white; border: none; border-radius: 30px; font-weight: 800; cursor: pointer;" onclick="document.getElementById('entryPopupModal').style.display='none'">닫기</button>
             </div>
-        <div style="text-align: center; padding-top: 15px; border-top: 1px dashed #e2e8f0; flex-shrink:0;">
-            <button style="padding: 10px 24px; font-size: 15px; background: #ffc595; color: white; border: none; border-radius: 30px; font-weight: 800; cursor: pointer;" onclick="document.getElementById('entryPopupModal').style.display='none'">닫기</button>
         </div>
     </div>
-</div>
 
     <div id="toastMessage"></div>
 <script type="module" src="script.js"></script>
