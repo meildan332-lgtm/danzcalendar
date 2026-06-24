@@ -466,18 +466,20 @@ function ensureMemberModal() {
 
     const html = `
     <div id="memberModal" data-injected="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(2px);">
-        <div style="background:#fff; padding:32px 40px; border-radius:30px; display:flex; flex-direction:column; gap:16px; min-width:320px; max-width:420px; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+        <div style="background:#fff; padding:32px 40px; border-radius:30px; display:flex; flex-direction:column; gap:16px; min-width:500px; max-width:600px; width:90%; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
             <h2 style="margin:0; font-family:'TMoneyDungunbaram', sans-serif; color:#7A5A2F; font-size:24px; text-align:center;">멤버 관리</h2>
             
-            <div id="memberList" style="max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+            <div id="memberList" style="max-height: 350px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; margin-top: 10px;"></div>
             
             <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
             
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <label style="font-weight:bold; color:#7A5A2F;">새 멤버 추가</label>
-                <input type="text" id="newMemberName" placeholder="멤버 이름 (닉네임)" style="width:100%; padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box;">
-                <input type="text" id="newMemberId" placeholder="SOOP 아이디" style="width:100%; padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; margin-bottom:4px; box-sizing:border-box;">
-                <button onclick="addMember()" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#ffc595; color:white; font-weight:bold; font-size:15px;">추가하기</button>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="newMemberName" placeholder="닉네임" style="flex:1; padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box;">
+                    <input type="text" id="newMemberId" placeholder="SOOP ID" style="flex:1; padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box;">
+                    <button onclick="addMember()" style="padding:0 20px; border:none; border-radius:30px; cursor:pointer; background:#ffc595; color:white; font-weight:bold;">추가</button>
+                </div>
             </div>
             
             <button onclick="closeModal('memberModal')" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px; margin-top:4px;">닫기</button>
@@ -514,12 +516,12 @@ function renderMemberList() {
     list.innerHTML = '';
     Object.values(members).forEach(m => {
         const item = document.createElement('div');
-        item.className = 'member-list-item';
-        item.style.cssText = 'display: flex; align-items: center; gap: 15px; padding: 12px; background: #f8fafc; border-radius: 30px; border: 1px solid #e2e8f0;';
+        // 카드형 디자인
+        item.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; background: #f8fafc; border-radius: 20px; border: 1px solid #e2e8f0; text-align: center;';
         item.innerHTML = `
-            <img src="${m.img}" class="member-img-preview" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #EEE;" onerror="this.src='https://placehold.co/100x100?text=?'">
-            <div style="flex:1; font-weight:800; color:#7A5A2F;">${m.name}</div>
-            <button style="color: #ef4444; font-weight: bold; background: none; border: none; cursor: pointer; padding: 4px 8px; font-size: 14px;" onclick="deleteMember('${m.name}')">삭제</button>
+            <img src="${m.img}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #EEE;" onerror="this.src='https://placehold.co/100x100?text=?'">
+            <div style="font-weight:800; color:#7A5A2F; font-size: 13px; overflow: hidden; text-overflow: ellipsis; width: 100%;">${m.name}</div>
+            <button style="color: #ef4444; font-weight: bold; background: none; border: none; cursor: pointer; font-size: 12px;" onclick="deleteMember('${m.name}')">삭제</button>
         `;
         list.appendChild(item);
     });
