@@ -1774,9 +1774,7 @@ window.loadUpItems = async function() {
 
         items.forEach(data => {
             if (data.deadline && data.deadline < todayStr) {
-                if (isAdmin) {
-                    deleteDoc(doc(db, data.source, data.id)).catch(e => console.log('만료된 UP 항목 자동 삭제 실패:', e));
-                }
+                // 관리자일 경우에도 데이터베이스에서 삭제하지 않고 화면(렌더링)에서만 숨깁니다.
                 return;
             }
             
