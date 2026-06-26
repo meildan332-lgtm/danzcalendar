@@ -1425,19 +1425,19 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
             tag.className = `event-tag type-${ev.type}${isLong ? ' long-term' : ''}`; tag.dataset.id = ev.id;
             tag.style.position = 'relative';
 
-        if (isDense) {
+if (isDense) {
             if (ev.time) {
-                // 💡 시간이 있는 경우: 전체를 오른쪽 정렬로 밀고, 제목을 시간 바로 왼쪽에 붙입니다.
+                // 💡 시간이 있는 경우: 전체를 오른쪽 정렬, 제목은 시간 왼쪽에서 줄바꿈 허용
                 tag.innerHTML = `
                     <span style="display: flex !important; width: 100% !important; justify-content: flex-end !important; align-items: center !important; gap: 6px !important; padding: 0 !important; margin: 0 !important;">
-                        <span style="display: block !important; text-align: right !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1 1 auto !important; line-height: 1.3;">${ev.title}</span>
+                        <span style="display: block !important; text-align: right !important; overflow: hidden; word-break: break-word; white-space: pre-wrap !important; flex: 1 1 auto !important; line-height: 1.3;">${ev.title}</span>
                         <span class="event-time-badge" style="position: static !important; flex-shrink: 0 !important; margin: 0 !important; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>
                     </span>
                 `;
             } else {
-                // 💡 시간이 없는 경우: 제목을 무조건 정중앙에 배치합니다.
+                // 💡 시간이 없는 경우: 제목을 무조건 정중앙에 배치하며 줄바꿈 허용
                 tag.innerHTML = `
-                    <span style="display: block !important; width: 100% !important; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.3;">${ev.title}</span>
+                    <span style="display: block !important; width: 100% !important; text-align: center !important; overflow: hidden; word-break: break-word; white-space: pre-wrap !important; line-height: 1.3;">${ev.title}</span>
                 `;
             }
         } else {
