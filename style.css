@@ -393,10 +393,12 @@ body {
 .event-tag div {
     overflow: hidden;
     width: 100%;
-    text-align: center !important;
+    text-align: left !important; /* 텍스트를 왼쪽으로 깔끔하게 정렬 */
     font-weight: 900 !important;
-    white-space: pre-wrap;
+    white-space: nowrap !important; /* 두 줄 이상으로 넘어가지 않게 방지 */
+    text-overflow: ellipsis !important; /* 글씨가 길어지면 ... 으로 처리 */
 }
+
 .dragging-ghost { background-color: var(--light-green) !important; opacity: 0.6; border: 2px dashed darkolivegreen; }
 .event-tag.long-term { position: relative; height: 28px !important; }
 
