@@ -577,7 +577,13 @@ async function loadMembersFromFirebase() {
     snapshot.forEach(docSnap => {
         const data = docSnap.data();
         if (!data || !data.name) return;
-        members[data.name] = { name: data.name, img: data.img || `https://placehold.co/100x100/FFD54F/ffffff?text=${encodeURIComponent(data.name[0] || '')}` };
+        let soopId = data.soopId || '';
+        if (!soopId && data.img) {
+            // img URL 구조: https://stimg.sooplive.com/LOGO/앞2자/아이디/아이디.jpg
+            const parts = data.img.split('/');
+            if (parts.length >= 6) soopId = parts[5];
+        }
+        members[data.name] = { name: data.name, img: data.img || `https://placehold.co/100x100/FFD54F/ffffff?text=${encodeURIComponent(data.name[0] || '')}`, soopId };
     });
 }
 
@@ -2633,11 +2639,13 @@ window.showDayInfo = function(dateId, dayEvents) {
                 ev.members.split(',').forEach(nameRaw => {
                     const name = nameRaw.trim(); if (!name) return;
                     const m = members[name] || { name, img: `https://placehold.co/100x100?text=${encodeURIComponent(name[0] || '')}` };
+                    const stationUrl = m.soopId ? `https://www.sooplive.com/station/${m.soopId}` : null;
+                    const imgTag = `<img src="${m.img}" class="profile-img" style="width: 80px; height: 80px;${stationUrl ? ' cursor:pointer;' : ''}" onerror="this.src='https://placehold.co/100x100?text=?'">`;
                     profsHtml += `
                         <!-- 카드 전체 폭을 늘리고, 가운데 정렬 속성 추가 -->
                         <div class="profile-card" style="display: flex; flex-direction: column; align-items: center; width: 90px; gap: 8px;">
                             <!-- 이미지 크기(width, height)를 80px로 크게 확장 -->
-                            <img src="${m.img}" class="profile-img" style="width: 80px; height: 80px;" onerror="this.src='https://placehold.co/100x100?text=?'">
+                            ${stationUrl ? `<a href="${stationUrl}" target="_blank" rel="noopener noreferrer" style="display:block; border-radius:50%; line-height:0;">${imgTag}</a>` : imgTag}
                             <!-- 글씨 크기(font-size)를 16px로 확장 -->
                             <div class="profile-name" style="font-size: 16px;">${m.name}</div>
                         </div>`;
