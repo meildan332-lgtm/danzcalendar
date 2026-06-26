@@ -1426,13 +1426,15 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
             tag.style.position = 'relative';
 
         if (isDense) {
-            // 💡 일정이 3개 이상일 때: 제목 가운데 정렬, 시간 우측 고정
-            // 양옆에 모두 여백을 주면 화면이 좁을 때 글씨가 사라지므로, 시간이 위치한 '오른쪽'에만 여백(42px)을 주어 글씨가 안전하게 정렬되도록 합니다.
+            // 💡 일정이 3개 이상일 때: 양팔 저울 방식 (가장 안정적)
+            // 왼쪽엔 투명한 빈 칸, 가운데는 제목, 오른쪽은 시간 뱃지를 넣어 정확한 정중앙을 유지합니다.
             tag.innerHTML = `
-                <div style="flex: 1; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding-right: ${ev.time ? '42px' : '0'}; line-height: 1.3;">${ev.title}</div>
-                ${ev.time ? `<span class="event-time-badge" style="position: absolute !important; right: 4px; top: 50%; transform: translateY(-50%); margin: 0; padding: 3px 6px; font-size: 10px; line-height: 1; z-index: 2; white-space: nowrap;">${formatTime12h(ev.time)}</span>` : ''}
+                ${ev.time ? `<div style="display: block !important; width: 55px !important; flex: 0 0 55px !important; order: 1 !important; margin: 0 !important; visibility: hidden;"></div>` : ''}
+                <div style="display: block !important; flex: 1 1 0% !important; min-width: 0 !important; order: 2 !important; margin: 0 !important; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.3;">${ev.title}</div>
+                ${ev.time ? `<div style="display: flex !important; width: 55px !important; flex: 0 0 55px !important; justify-content: flex-end !important; align-items: center !important; order: 3 !important; margin: 0 !important;"><span class="event-time-badge" style="position: static !important; margin: 0 !important; padding: 3px 6px !important; font-size: 10px; line-height: 1; white-space: nowrap;">${formatTime12h(ev.time)}</span></div>` : ''}
             `;
-        } else {                // 💡 일정이 1~2개일 때: 기존 방식 유지 (가운데 정렬, 시간 우측 상단 뱃지)
+        } else {
+                // 💡 일정이 1~2개일 때: 기존 방식 유지 (가운데 정렬, 시간 우측 상단 뱃지)
                 tag.innerHTML = `${ev.time ? `<span class="event-time-badge" style="position: absolute; top: 3px; right: 6px; left: auto; margin: 0; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>` : ''}<div style="flex: 1; text-align: center !important; width: 100%; line-height: 1.3; word-break: break-word; white-space: pre-wrap !important;">${ev.title}</div>`;
             }
             
