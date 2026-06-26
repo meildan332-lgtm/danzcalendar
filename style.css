@@ -400,7 +400,7 @@ body {
 .dragging-ghost { background-color: var(--light-green) !important; opacity: 0.6; border: 2px dashed darkolivegreen; }
 .event-tag.long-term { position: relative; height: 28px !important; }
 
-.type-개인방송 { background-color:#ffc595 !important; color: #8b4811 !important; } /* 연한 분홍 배경 */
+.type-개인방송 { background-color:#ffcfa8 !important; color: #8b4811 !important; } /* 연한 분홍 배경 */
 .type-합방 { background-color: #ffe6f0 !important; color: #8c1b4f !important; } /* 베이지 배경 + 진한 분홍 텍스트 */
 .type-휴방 { background-color: #e2e2e2 !important; color: #7c7c7c !important; }
 .type-시네티 { background-color: #c8e6b0 !important; color: #477422 !important; }
