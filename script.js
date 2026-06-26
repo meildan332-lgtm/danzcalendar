@@ -1429,7 +1429,7 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
                 // 💡 일정이 3개 이상일 때: 제목 왼쪽, 시간 뱃지 오른쪽 (한 줄 가로 배치)
                 // 빽빽해지는 것을 방지하기 위해 텍스트는 한 줄로 처리(nowrap)하고 넘치면 '...' 표시
                 tag.innerHTML = `
-                    <div style="flex: 1; text-align: left !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; padding-right: 5px; line-height: 1.3;">${ev.title}</div>
+                    <div style="flex: 1; text-align: left !important; overflow: hidden; padding-right: 5px; line-height: 1.3;">${ev.title}</div>
                     ${ev.time ? `<span class="event-time-badge" style="position: static !important; margin: 0; margin-left: 4px; font-size: 10px; line-height: 1; flex-shrink: 0;">${formatTime12h(ev.time)}</span>` : ''}
                 `;
             } else {
