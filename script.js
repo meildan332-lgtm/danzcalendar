@@ -1426,13 +1426,20 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
             tag.style.position = 'relative';
 
         if (isDense) {
-            // 💡 일정이 3개 이상일 때: 양팔 저울 방식 (가장 안정적)
-            // 왼쪽엔 투명한 빈 칸, 가운데는 제목, 오른쪽은 시간 뱃지를 넣어 정확한 정중앙을 유지합니다.
-            tag.innerHTML = `
-                ${ev.time ? `<div style="display: block !important; width: 55px !important; flex: 0 0 55px !important; order: 1 !important; margin: 0 !important; visibility: hidden;"></div>` : ''}
-                <div style="display: block !important; flex: 1 1 0% !important; min-width: 0 !important; order: 2 !important; margin: 0 !important; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.3;">${ev.title}</div>
-                ${ev.time ? `<div style="display: flex !important; width: 55px !important; flex: 0 0 55px !important; justify-content: flex-end !important; align-items: center !important; order: 3 !important; margin: 0 !important;"><span class="event-time-badge" style="position: static !important; margin: 0 !important; padding: 3px 6px !important; font-size: 10px; line-height: 1; white-space: nowrap;">${formatTime12h(ev.time)}</span></div>` : ''}
-            `;
+            if (ev.time) {
+                // 💡 시간이 있는 경우: 전체를 오른쪽 정렬로 밀고, 제목을 시간 바로 왼쪽에 붙입니다.
+                tag.innerHTML = `
+                    <span style="display: flex !important; width: 100% !important; justify-content: flex-end !important; align-items: center !important; gap: 6px !important; padding: 0 !important; margin: 0 !important;">
+                        <span style="display: block !important; text-align: right !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1 1 auto !important; line-height: 1.3;">${ev.title}</span>
+                        <span class="event-time-badge" style="position: static !important; flex-shrink: 0 !important; margin: 0 !important; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>
+                    </span>
+                `;
+            } else {
+                // 💡 시간이 없는 경우: 제목을 무조건 정중앙에 배치합니다.
+                tag.innerHTML = `
+                    <span style="display: block !important; width: 100% !important; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height: 1.3;">${ev.title}</span>
+                `;
+            }
         } else {
                 // 💡 일정이 1~2개일 때: 기존 방식 유지 (가운데 정렬, 시간 우측 상단 뱃지)
                 tag.innerHTML = `${ev.time ? `<span class="event-time-badge" style="position: absolute; top: 3px; right: 6px; left: auto; margin: 0; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>` : ''}<div style="flex: 1; text-align: center !important; width: 100%; line-height: 1.3; word-break: break-word; white-space: pre-wrap !important;">${ev.title}</div>`;
