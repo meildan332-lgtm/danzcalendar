@@ -1428,7 +1428,7 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
         if (isDense) {
             // 💡 일정이 3개 이상일 때: 제목 가운데 정렬, 시간 우측 배치 (겹침 방지)
             // 시간이 있을 경우 양옆에 50px 여백을 주어 중앙 정렬을 유지하면서 시간 뱃지와 겹치지 않게 합니다.
-            const paddingValue = ev.time ? '50px' : '5px';
+            const paddingValue = ev.time ? '10px' : '5px';
             tag.innerHTML = `
                 <div style="flex: 1; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 ${paddingValue}; line-height: 1.3;">${ev.title}</div>
                 ${ev.time ? `<span class="event-time-badge" style="position: absolute !important; right: 8px; top: 50%; transform: translateY(-50%); margin: 0; font-size: 10px; line-height: 1; flex-shrink: 0; z-index: 2;">${formatTime12h(ev.time)}</span>` : ''}
