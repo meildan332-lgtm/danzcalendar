@@ -1379,10 +1379,14 @@ function applyDraggable() {
                 el.sortableInstance = new Sortable(el, {
                     animation: 150, ghostClass: 'dragging-ghost', fallbackOnBody: true, delay: 200, delayOnTouchOnly: true, fallbackTolerance: 5,
                     onStart: function(evt) { evt.item.style.height = evt.item.offsetHeight + 'px'; },
-                    onEnd: function (evt) {
+                    onEnd: async function (evt) { // async 추가
                         evt.item.style.height = '';
                         const dateId = evt.to.closest('.day')?.dataset.dateId || evt.to.parentElement.closest('.week-row')?.dataset.dateId;
-                        if (dateId) modifiedDates.add(dateId);
+                        if (dateId) {
+                            modifiedDates.add(dateId);
+                            // 드래그가 끝나면 즉시 서버에 순서 저장
+                            await saveAllModifiedOrders(); 
+                        }
                     }
                 });
             }
@@ -2418,7 +2422,17 @@ async function saveAllModifiedOrders() {
             const items = container.querySelectorAll('.event-tag');
             items.forEach((item, index) => {
                 const docId = item.dataset.id;
-                if (docId) updatePromises.push(updateDoc(doc(db, 'events', docId), { order: index }));
+                if (docId) {
+                    // 1. 파이어베이스 서버에 순서 업데이트
+                    updatePromises.push(updateDoc(doc(db, 'events', docId), { order: index }));
+                    
+                    // 2. 현재 메모리에 로드된 events 객체에도 순서(order) 즉시 반영
+                    Object.values(events).flat().forEach(ev => {
+                        if (ev.id === docId) {
+                            ev.order = index;
+                        }
+                    });
+                }
             });
         }
     }
