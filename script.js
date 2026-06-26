@@ -1417,14 +1417,26 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
     const evCont = document.createElement('div'); evCont.className = 'event-container';
     const displayEvents = dayEvents.filter(ev => ev.title !== '일정미정');
     if (isCurr && displayEvents.length > 0) {
+        const isDense = displayEvents.length >= 3; // 일정이 3개 이상인지 확인
+
         displayEvents.forEach((ev, idx) => {
             const isLong = ev.startDate && ev.endDate && (new Date(ev.endDate) > new Date(ev.startDate));
             const tag = document.createElement('div');
             tag.className = `event-tag type-${ev.type}${isLong ? ' long-term' : ''}`; tag.dataset.id = ev.id;
             tag.style.position = 'relative';
 
-            // 텍스트 강제 가운데 정렬(text-align: center)
-            tag.innerHTML = `${ev.time ? `<span class="event-time-badge" style="position: absolute; top: 3px; right: 6px; left: auto; margin: 0; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>` : ''}<div style="flex: 1; text-align: center; width: 100%; line-height: 1.3; word-break: break-word;">${ev.title}</div>`;
+            if (isDense) {
+                // 💡 일정이 3개 이상일 때: 제목 왼쪽, 시간 뱃지 오른쪽 (한 줄 가로 배치)
+                // 빽빽해지는 것을 방지하기 위해 텍스트는 한 줄로 처리(nowrap)하고 넘치면 '...' 표시
+                tag.innerHTML = `
+                    <div style="flex: 1; text-align: left !important; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; padding-right: 5px; line-height: 1.3;">${ev.title}</div>
+                    ${ev.time ? `<span class="event-time-badge" style="position: static !important; margin: 0; margin-left: 4px; font-size: 10px; line-height: 1; flex-shrink: 0;">${formatTime12h(ev.time)}</span>` : ''}
+                `;
+            } else {
+                // 💡 일정이 1~2개일 때: 기존 방식 유지 (가운데 정렬, 시간 우측 상단 뱃지)
+                tag.innerHTML = `${ev.time ? `<span class="event-time-badge" style="position: absolute; top: 3px; right: 6px; left: auto; margin: 0; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>` : ''}<div style="flex: 1; text-align: center !important; width: 100%; line-height: 1.3; word-break: break-word; white-space: pre-wrap !important;">${ev.title}</div>`;
+            }
+            
             evCont.appendChild(tag);
         });
     }
