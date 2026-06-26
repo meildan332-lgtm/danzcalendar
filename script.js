@@ -1426,15 +1426,13 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
             tag.style.position = 'relative';
 
         if (isDense) {
-            // 💡 일정이 3개 이상일 때: 제목 가운데 정렬, 시간 우측 배치 (겹침 방지)
-            // 시간이 있을 경우 양옆에 50px 여백을 주어 중앙 정렬을 유지하면서 시간 뱃지와 겹치지 않게 합니다.
-            const paddingValue = ev.time ? '10px' : '5px';
+            // 💡 일정이 3개 이상일 때: 제목 가운데 정렬, 시간 우측 고정
+            // 양옆에 모두 여백을 주면 화면이 좁을 때 글씨가 사라지므로, 시간이 위치한 '오른쪽'에만 여백(42px)을 주어 글씨가 안전하게 정렬되도록 합니다.
             tag.innerHTML = `
-                <div style="flex: 1; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 ${paddingValue}; line-height: 1.3;">${ev.title}</div>
-                ${ev.time ? `<span class="event-time-badge" style="position: absolute !important; right: 8px; top: 50%; transform: translateY(-50%); margin: 0; font-size: 10px; line-height: 1; flex-shrink: 0; z-index: 2;">${formatTime12h(ev.time)}</span>` : ''}
+                <div style="flex: 1; text-align: center !important; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding-right: ${ev.time ? '42px' : '0'}; line-height: 1.3;">${ev.title}</div>
+                ${ev.time ? `<span class="event-time-badge" style="position: absolute !important; right: 4px; top: 50%; transform: translateY(-50%); margin: 0; padding: 3px 6px; font-size: 10px; line-height: 1; z-index: 2; white-space: nowrap;">${formatTime12h(ev.time)}</span>` : ''}
             `;
-        } else {
-                // 💡 일정이 1~2개일 때: 기존 방식 유지 (가운데 정렬, 시간 우측 상단 뱃지)
+        } else {                // 💡 일정이 1~2개일 때: 기존 방식 유지 (가운데 정렬, 시간 우측 상단 뱃지)
                 tag.innerHTML = `${ev.time ? `<span class="event-time-badge" style="position: absolute; top: 3px; right: 6px; left: auto; margin: 0; font-size: 10px; line-height: 1;">${formatTime12h(ev.time)}</span>` : ''}<div style="flex: 1; text-align: center !important; width: 100%; line-height: 1.3; word-break: break-word; white-space: pre-wrap !important;">${ev.title}</div>`;
             }
             
