@@ -1424,7 +1424,7 @@ function createDay(num, isCurr, dayEvents = [], dayDate) {
             tag.style.position = 'relative';
 
             // 텍스트 강제 가운데 정렬(text-align: center)
-            tag.innerHTML = `<div style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: ${ev.time ? '8px' : '0'}; line-height: 1.3;">${ev.title}</div>${ev.time ? `<span class="event-time-badge" style="position: static; margin: 0; font-size: 11px; flex-shrink: 0; padding: 3px 8px;">${formatTime12h(ev.time)}</span>` : ''}`;
+        tag.innerHTML = `<div style="flex: 1; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin-right: ${ev.time ? '8px' : '0'}; line-height: 1.3;">${ev.title}</div>${ev.time ? `<span class="event-time-badge" style="position: static; margin: 0; font-size: 11px; flex-shrink: 0; padding: 3px 8px;">${formatTime12h(ev.time)}</span>` : ''}`;
             evCont.appendChild(tag);
         });
     }
