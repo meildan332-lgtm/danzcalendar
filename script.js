@@ -2737,15 +2737,15 @@ window.showDayInfo = async function(dateId, dayEvents) {
 
             noticeSnapshot.forEach(docSnap => {
                 const data = docSnap.data();
-                // postedAt 필드: Firestore Timestamp 또는 문자열(YYYY-MM-DD) 모두 지원
+                // post_date 필드: 문자열("YYYY-MM-DD HH:MM:SS") 또는 Timestamp 모두 지원
                 let noticeDate = '';
-                if (data.postedAt) {
-                    if (typeof data.postedAt.toDate === 'function') {
-                        // Firestore Timestamp
-                        const d = data.postedAt.toDate();
+                const rawDate = data.post_date || data.postedAt;
+                if (rawDate) {
+                    if (typeof rawDate === 'string') {
+                        noticeDate = rawDate.substring(0, 10);
+                    } else if (typeof rawDate.toDate === 'function') {
+                        const d = rawDate.toDate();
                         noticeDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                    } else if (typeof data.postedAt === 'string') {
-                        noticeDate = data.postedAt.substring(0, 10);
                     }
                 }
                 if (noticeDate === normalizedDate) {
