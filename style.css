@@ -1284,7 +1284,7 @@ body.admin-mode #adminBtn .login-text {
     width: 100%;
     padding: 14px 20px;
     margin-bottom: 10px;
-    background: linear-gradient(135deg, #ffc595 0%, #ffb07a 100%);
+    background: #ffc595; /* 그라데이션을 없애고 시작 색상이었던 단색으로 변경 */
     border: 2px solid #ff9a55;
     border-radius: 30px;
     text-decoration: none;
@@ -1299,9 +1299,9 @@ body.admin-mode #adminBtn .login-text {
 }
 
 .notice-day-btn:hover {
-    background: linear-gradient(135deg, #ffb07a 0%, #ff9a55 100%);
+    background: #ffb07a; /* 호버 시에도 그라데이션을 없애고 단색으로 변경 */
     color: #ffffff;
-    box-shadow: 0 4px 16px rgba(255, 154, 85, 0.5);
+    box-shadow: none; /* 호버 효과에서 그림자 제거[cite: 1] */
     transform: translateY(-1px);
 }
 
