@@ -1284,11 +1284,11 @@ body.admin-mode #adminBtn .login-text {
     width: 100%;
     padding: 14px 20px;
     margin-bottom: 10px;
-    background: linear-gradient(135deg, #FFF8E1 0%, #FFF3B0 100%);
-    border: 2px solid #ffc595;
+    background: linear-gradient(135deg, #ffc595 0%, #ffb07a 100%);
+    border: 2px solid #ff9a55;
     border-radius: 30px;
     text-decoration: none;
-    color: #7A5A2F;
+    color: #ffffff;
     font-weight: 800;
     font-size: 15px;
     font-family: 'TMoneyDungunbaram', sans-serif;
@@ -1299,9 +1299,9 @@ body.admin-mode #adminBtn .login-text {
 }
 
 .notice-day-btn:hover {
-    background: linear-gradient(135deg, #ffc595 0%, #ffb07a 100%);
+    background: linear-gradient(135deg, #ffb07a 0%, #ff9a55 100%);
     color: #ffffff;
-    box-shadow: 0 4px 16px rgba(255, 197, 149, 0.45);
+    box-shadow: 0 4px 16px rgba(255, 154, 85, 0.5);
     transform: translateY(-1px);
 }
 
