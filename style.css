@@ -1275,3 +1275,68 @@ body.admin-mode #adminBtn .login-text {
     }
 }
 
+
+/* ===== 일정 상세 공지 버튼 ===== */
+.notice-day-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 14px 20px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFF3B0 100%);
+    border: 2px solid #ffc595;
+    border-radius: 30px;
+    text-decoration: none;
+    color: #7A5A2F;
+    font-weight: 800;
+    font-size: 15px;
+    font-family: 'TMoneyDungunbaram', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(255, 197, 149, 0.25);
+}
+
+.notice-day-btn:hover {
+    background: linear-gradient(135deg, #ffc595 0%, #ffb07a 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(255, 197, 149, 0.45);
+    transform: translateY(-1px);
+}
+
+.notice-day-btn-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.notice-day-btn-text {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notice-day-btn-arrow {
+    font-size: 16px;
+    font-weight: 900;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+#dayInfoNoticeArea {
+    width: 100%;
+    max-width: 600px;
+    margin: 15px auto 0;
+    display: none;
+    padding: 0 4px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .notice-day-btn {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+}

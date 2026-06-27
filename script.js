@@ -2640,7 +2640,7 @@ function ensureDayInfoModal() {
     document.body.insertAdjacentHTML('beforeend', html);
 }
 
-window.showDayInfo = function(dateId, dayEvents) {
+window.showDayInfo = async function(dateId, dayEvents) {
     ensureDayInfoModal();
     const parts = dateId.split('-');
     document.getElementById('dayInfoTitle').innerText = `${parts[0]}년 ${parts[1]}월 ${parts[2]}일`;
@@ -2720,6 +2720,60 @@ window.showDayInfo = function(dateId, dayEvents) {
                 list.appendChild(divider);
             }
         });
+    }
+
+    // 공지 버튼: danz_notice 컬렉션에서 해당 날짜와 일치하는 공지 조회
+    const noticeArea = document.getElementById('dayInfoNoticeArea');
+    if (noticeArea) {
+        noticeArea.style.display = 'none';
+        noticeArea.innerHTML = '';
+
+        try {
+            // dateId를 YYYY-MM-DD 형식으로 정규화
+            const normalizedDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+
+            const noticeSnapshot = await getDocs(collection(db, 'danz_notice'));
+            let matchedNotices = [];
+
+            noticeSnapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                // postedAt 필드: Firestore Timestamp 또는 문자열(YYYY-MM-DD) 모두 지원
+                let noticeDate = '';
+                if (data.postedAt) {
+                    if (typeof data.postedAt.toDate === 'function') {
+                        // Firestore Timestamp
+                        const d = data.postedAt.toDate();
+                        noticeDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    } else if (typeof data.postedAt === 'string') {
+                        noticeDate = data.postedAt.substring(0, 10);
+                    }
+                }
+                if (noticeDate === normalizedDate) {
+                    matchedNotices.push({ id: docSnap.id, ...data });
+                }
+            });
+
+            if (matchedNotices.length > 0) {
+                noticeArea.style.display = 'block';
+                matchedNotices.forEach(notice => {
+                    const link = notice.link || notice.url || notice.noticeUrl || '';
+                    const title = notice.title || '공지사항 보기';
+                    const btn = document.createElement('a');
+                    btn.href = link || '#';
+                    if (link) btn.target = '_blank';
+                    btn.rel = 'noopener noreferrer';
+                    btn.className = 'notice-day-btn';
+                    btn.innerHTML = `
+                        <span class="notice-day-btn-icon">📢</span>
+                        <span class="notice-day-btn-text">${title}</span>
+                        <span class="notice-day-btn-arrow">↗</span>
+                    `;
+                    noticeArea.appendChild(btn);
+                });
+            }
+        } catch (e) {
+            console.warn('danz_notice 조회 실패:', e);
+        }
     }
 
     document.getElementById('dayInfoModal').style.display = 'flex';
