@@ -1285,7 +1285,6 @@ body.admin-mode #adminBtn .login-text {
     padding: 14px 20px;
     margin-bottom: 10px;
     background: #ffc595; /* 그라데이션을 없애고 시작 색상이었던 단색으로 변경 */
-    border: 2px solid #ff9a55;
     border-radius: 30px;
     text-decoration: none;
     color: #ffffff;
