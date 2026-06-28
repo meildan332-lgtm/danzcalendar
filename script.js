@@ -240,6 +240,7 @@ let currentDate = new Date();
 let events = {};
 let loadedMonths = new Set();
 let members = {};
+let groups = {};
 let currentAMPM = '오전';
 let activeMemoTab = '메모';
 let activeDateId = '';
@@ -513,10 +514,11 @@ async function openMemberManager() {
 function renderMemberList() {
     const list = document.getElementById('memberList');
     if (!list) return;
+    const searchVal = (document.getElementById('memberSearchInput')?.value || '').trim().toLowerCase();
     list.innerHTML = '';
-    Object.values(members).forEach(m => {
+    const filtered = Object.values(members).filter(m => !searchVal || m.name.toLowerCase().includes(searchVal));
+    filtered.forEach(m => {
         const item = document.createElement('div');
-        // 카드형 디자인
         item.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px; background: #f8fafc; border-radius: 20px; border: 1px solid #e2e8f0; text-align: center;';
         item.innerHTML = `
             <img src="${m.img}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #EEE;" onerror="this.src='https://placehold.co/100x100?text=?'">
@@ -525,7 +527,12 @@ function renderMemberList() {
         `;
         list.appendChild(item);
     });
+    if (list.children.length === 0 && searchVal) {
+        list.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#aaa; padding:16px; font-size:13px;">검색 결과가 없습니다</div>';
+    }
 }
+
+window.filterMemberList = function() { renderMemberList(); };
 
 function showToast(msg) {
     const toast = document.getElementById('toastMessage');
@@ -587,6 +594,218 @@ async function loadMembersFromFirebase() {
     });
 }
 
+// 멤버 문자열에서 그룹명을 실제 멤버 이름들로 확장하는 헬퍼
+function expandMembersWithGroups(membersStr) {
+    if (!membersStr) return [];
+    const result = [];
+    const seen = new Set();
+    membersStr.split(',').forEach(nameRaw => {
+        const name = nameRaw.trim();
+        if (!name) return;
+        if (groups[name]) {
+            (groups[name].members || []).forEach(mName => {
+                if (!seen.has(mName)) { seen.add(mName); result.push(mName); }
+            });
+        } else {
+            if (!seen.has(name)) { seen.add(name); result.push(name); }
+        }
+    });
+    return result;
+}
+
+async function loadGroupsFromFirebase() {
+    groups = {};
+    try {
+        const snapshot = await getDocs(collection(db, 'groups'));
+        snapshot.forEach(docSnap => {
+            const data = docSnap.data();
+            if (data && data.name) groups[data.name] = { ...data, docId: docSnap.id };
+        });
+    } catch(e) { console.log('그룹 로드 실패:', e); }
+}
+
+window.openGroupModal = function() {
+    resetGroupForm();
+    renderGroupList();
+    document.getElementById('groupModal').style.display = 'flex';
+};
+
+function renderGroupList() {
+    const container = document.getElementById('groupList');
+    if (!container) return;
+    const groupArr = Object.values(groups);
+    if (groupArr.length === 0) {
+        container.innerHTML = '<div style="color:#aaa; font-size:13px; text-align:center; padding:8px;">등록된 그룹이 없습니다</div>';
+        return;
+    }
+    container.innerHTML = '';
+    groupArr.forEach(g => {
+        const div = document.createElement('div');
+        div.style.cssText = 'display:flex; align-items:center; gap:8px; padding:10px 12px; background:#fafaf9; border-radius:10px; margin-bottom:8px; border:1px solid #e5e7eb;';
+        div.innerHTML = `
+            <span style="font-weight:900; color:#7A5A2F; flex:1; min-width:0;">👥 ${g.name}</span>
+            <span style="font-size:12px; color:#888; flex:2; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${(g.members||[]).join(', ')}</span>
+            <button onclick="editGroup('${g.name}')" style="background:#E8F4FD; border:1.5px solid #b3d9f5; color:#1a6ba0; font-size:12px; font-weight:900; padding:4px 10px; border-radius:7px; cursor:pointer; white-space:nowrap; flex-shrink:0;">수정</button>
+            <button onclick="deleteGroup('${g.name}')" style="background:transparent; border:none; color:#e57373; font-size:18px; cursor:pointer; font-weight:900; line-height:1; padding:2px 4px; flex-shrink:0;">✕</button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+let editingGroupOriginalName = null;
+let groupSelectedMembers = new Set();
+
+function renderGroupMemberPicker(searchVal) {
+    const picker = document.getElementById('groupMemberPicker');
+    if (!picker) return;
+    picker.innerHTML = '';
+    const sv = (searchVal || '').toLowerCase();
+    const allMembers = Object.values(members).filter(m => !sv || m.name.toLowerCase().includes(sv));
+    if (allMembers.length === 0) {
+        picker.innerHTML = '<div style="color:#aaa; font-size:13px;">검색 결과 없음</div>';
+        return;
+    }
+    allMembers.forEach(m => {
+        const isChecked = groupSelectedMembers.has(m.name);
+        const label = document.createElement('label');
+        label.style.cssText = `display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; padding:6px 8px; border-radius:10px; border:1.5px solid ${isChecked ? '#FDE047' : '#e5e7eb'}; background:${isChecked ? '#FFF9C4' : '#fff'}; transition:all 0.15s; min-width:64px;`;
+        label.innerHTML = `
+            <input type="checkbox" value="${m.name}" style="display:none;" ${isChecked ? 'checked' : ''}>
+            <img src="${m.img}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;" onerror="this.src='https://placehold.co/100x100?text=?'">
+            <span style="font-size:11px; font-weight:800; color:#4E4942; text-align:center; word-break:break-all;">${m.name}</span>
+        `;
+        const cb = label.querySelector('input');
+        cb.addEventListener('change', () => {
+            if (cb.checked) {
+                groupSelectedMembers.add(m.name);
+                label.style.background = '#FFF9C4';
+                label.style.borderColor = '#FDE047';
+            } else {
+                groupSelectedMembers.delete(m.name);
+                label.style.background = '#fff';
+                label.style.borderColor = '#e5e7eb';
+            }
+            updateGroupSelectedPreview();
+        });
+        picker.appendChild(label);
+    });
+}
+
+window.filterGroupMemberPicker = function() {
+    const sv = document.getElementById('groupMemberSearch').value;
+    renderGroupMemberPicker(sv);
+};
+
+window.updateGroupSelectedPreview = function() {
+    const preview = document.getElementById('groupSelectedPreview');
+    if (preview) preview.textContent = groupSelectedMembers.size > 0 ? `선택: ${[...groupSelectedMembers].join(', ')}` : '';
+};
+
+function resetGroupForm() {
+    groupSelectedMembers.clear();
+    editingGroupOriginalName = null;
+    const nameEl = document.getElementById('newGroupName');
+    const searchEl = document.getElementById('groupMemberSearch');
+    const saveBtn = document.getElementById('groupSaveBtn');
+    const cancelBtn = document.getElementById('groupCancelEditBtn');
+    if (nameEl) nameEl.value = '';
+    if (searchEl) searchEl.value = '';
+    if (saveBtn) saveBtn.textContent = '그룹 저장';
+    if (cancelBtn) cancelBtn.style.display = 'none';
+    renderGroupMemberPicker('');
+    updateGroupSelectedPreview();
+}
+
+window.saveGroup = async function() {
+    const name = document.getElementById('newGroupName').value.trim();
+    if (!name) return showToast('그룹 이름을 입력해주세요.');
+    if (groupSelectedMembers.size === 0) return showToast('멤버를 1명 이상 선택해주세요.');
+    const selectedMembers = [...groupSelectedMembers];
+    const data = { name, members: selectedMembers };
+    try {
+        if (editingGroupOriginalName !== null && editingGroupOriginalName !== name) {
+            await deleteDoc(doc(db, 'groups', `group_${encodeURIComponent(editingGroupOriginalName)}`));
+        }
+        const id = `group_${encodeURIComponent(name)}`;
+        await setDoc(doc(db, 'groups', id), data);
+        await loadGroupsFromFirebase();
+        renderGroupList();
+        const msg = editingGroupOriginalName !== null ? `그룹 "${name}" 이(가) 수정되었습니다.` : `그룹 "${name}" 이(가) 저장되었습니다.`;
+        resetGroupForm();
+        showToast(msg);
+    } catch(e) { showToast('저장 실패: ' + e.message); }
+};
+
+window.editGroup = function(name) {
+    const g = groups[name];
+    if (!g) return;
+    editingGroupOriginalName = name;
+    document.getElementById('newGroupName').value = g.name;
+    document.getElementById('groupMemberSearch').value = '';
+    groupSelectedMembers = new Set(g.members || []);
+    renderGroupMemberPicker('');
+    updateGroupSelectedPreview();
+    const saveBtn = document.getElementById('groupSaveBtn');
+    const cancelBtn = document.getElementById('groupCancelEditBtn');
+    if (saveBtn) saveBtn.textContent = '수정 저장';
+    if (cancelBtn) cancelBtn.style.display = 'block';
+    document.getElementById('newGroupName').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('newGroupName').focus();
+};
+
+window.cancelGroupEdit = function() { resetGroupForm(); };
+
+window.deleteGroup = function(name) {
+    const btn = document.getElementById('confirmBtn');
+    document.getElementById('confirmMessage').innerText = `[${name}] 그룹을 삭제할까요?`;
+    btn.onclick = async () => {
+        try {
+            await deleteDoc(doc(db, 'groups', `group_${encodeURIComponent(name)}`));
+            delete groups[name];
+            renderGroupList();
+            closeModal('confirmModal');
+            showToast(`그룹 "${name}" 이(가) 삭제되었습니다.`);
+        } catch(e) { showToast('삭제 실패'); }
+    };
+    document.getElementById('confirmModal').style.display = 'flex';
+};
+
+// 일정 추가 멤버 입력란 그룹 자동완성
+window.onEventMembersInput = function() {
+    const input = document.getElementById('eventMembers');
+    const suggestions = document.getElementById('groupSuggestions');
+    if (!input || !suggestions) return;
+    const val = input.value;
+    const parts = val.split(',');
+    const last = parts[parts.length - 1].trim();
+    if (!last) { suggestions.style.display = 'none'; return; }
+    const matched = Object.values(groups).filter(g => g.name.toLowerCase().includes(last.toLowerCase()));
+    if (matched.length === 0) { suggestions.style.display = 'none'; return; }
+    suggestions.style.display = 'block';
+    suggestions.innerHTML = '';
+    matched.forEach(g => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding:10px 14px; cursor:pointer; font-size:13px; font-weight:700; border-bottom:1px solid #f5f5f5; display:flex; align-items:center; gap:8px;';
+        item.innerHTML = `<span style="color:#1a6ba0;">👥 ${g.name}</span><span style="color:#888; font-weight:400; font-size:12px;">${(g.members||[]).join(', ')}</span>`;
+        item.onmouseenter = () => { item.style.background = '#FFF9C4'; };
+        item.onmouseleave = () => { item.style.background = 'transparent'; };
+        item.onclick = () => {
+            const before = parts.slice(0, -1).map(s => s.trim()).filter(Boolean);
+            const newVal = [...before, (g.members || []).join(', ')].join(', ');
+            input.value = newVal;
+            suggestions.style.display = 'none';
+        };
+        suggestions.appendChild(item);
+    });
+};
+
+document.addEventListener('click', function(e) {
+    const sugg = document.getElementById('groupSuggestions');
+    if (sugg && !sugg.contains(e.target) && e.target.id !== 'eventMembers') {
+        sugg.style.display = 'none';
+    }
+});
+
 async function loadEventsForMonth(year, month) {
     const monthKey = `${year}-${month}`;
     if (loadedMonths.has(monthKey)) return;
@@ -634,6 +853,7 @@ async function ensureMonthsLoadedForDate(date) {
 async function loadData() {
     try { 
         await loadMembersFromFirebase();
+        await loadGroupsFromFirebase();
         await loadMemos();
         try { await loadUpItems(); } catch (e) { console.log("UP 컬렉션 로드 실패:", e); }
     } catch (error) { console.error("데이터 로드 오류:", error); }
@@ -1511,8 +1731,7 @@ function showInfoByEvent(ev) {
     if (profs) {
         profs.innerHTML = '';
         if (ev.members) {
-            ev.members.split(',').forEach(nameRaw => {
-                const name = nameRaw.trim(); if (!name) return;
+            expandMembersWithGroups(ev.members).forEach(name => {
                 const m = members[name] || { name, img: `https://placehold.co/100x100?text=${encodeURIComponent(name[0] || '')}` };
                 const card = document.createElement('div'); card.className = 'profile-card';
                 card.innerHTML = `<img src="${m.img}" class="profile-img" onerror="this.src='https://placehold.co/100x100?text=?'"><div class="profile-name">${m.name}</div>`;
@@ -2670,17 +2889,13 @@ window.showDayInfo = async function(dateId, dayEvents) {
 
             let profsHtml = '';
             if (ev.members) {
-                ev.members.split(',').forEach(nameRaw => {
-                    const name = nameRaw.trim(); if (!name) return;
+                expandMembersWithGroups(ev.members).forEach(name => {
                     const m = members[name] || { name, img: `https://placehold.co/100x100?text=${encodeURIComponent(name[0] || '')}` };
                     const stationUrl = m.soopId ? `https://www.sooplive.com/station/${m.soopId}` : null;
                     const imgTag = `<img src="${m.img}" class="profile-img" style="width: 80px; height: 80px;${stationUrl ? ' cursor:pointer;' : ''}" onerror="this.src='https://placehold.co/100x100?text=?'">`;
                     profsHtml += `
-                        <!-- 카드 전체 폭을 늘리고, 가운데 정렬 속성 추가 -->
                         <div class="profile-card" style="display: flex; flex-direction: column; align-items: center; width: 90px; gap: 8px;">
-                            <!-- 이미지 크기(width, height)를 80px로 크게 확장 -->
                             ${stationUrl ? `<a href="${stationUrl}" target="_blank" rel="noopener noreferrer" style="display:block; border-radius:50%; line-height:0;">${imgTag}</a>` : imgTag}
-                            <!-- 글씨 크기(font-size)를 16px로 확장 -->
                             <div class="profile-name" style="font-size: 16px;">${m.name}</div>
                         </div>`;
                 });
@@ -2784,7 +2999,9 @@ Object.assign(window, {
     handleEventImgUpload, addMember, deleteMember, openMemberManager,
     renderMemberList, showToast, closeModal, formatTime12h, setAMPM,
     openAddModal, saveEvent, deleteEvent, showInfo, openMemoInput,
-    closeMemoInput, saveMemoItem, selectMemoTab
+    closeMemoInput, saveMemoItem, selectMemoTab,
+    filterMemberList, openGroupModal, saveGroup, deleteGroup, editGroup,
+    cancelGroupEdit, updateGroupSelectedPreview, filterGroupMemberPicker, onEventMembersInput
 });
 
 document.addEventListener('contextmenu', function(e) {
