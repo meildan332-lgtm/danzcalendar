@@ -469,10 +469,12 @@ function ensureMemberModal() {
     <div id="memberModal" data-injected="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(2px);">
         <div style="background:#fff; padding:32px 40px; border-radius:30px; display:flex; flex-direction:column; gap:16px; min-width:500px; max-width:600px; width:90%; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
             <h2 style="margin:0; font-family:'TMoneyDungunbaram', sans-serif; color:#7A5A2F; font-size:24px; text-align:center;">멤버 관리</h2>
+
+            <input type="text" id="memberSearchInput" placeholder="🔍 멤버 검색..." oninput="filterMemberList()" style="padding:12px 14px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box; width:100%;">
+
+            <div id="memberList" style="max-height: 280px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;"></div>
             
-            <div id="memberList" style="max-height: 350px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; margin-top: 10px;"></div>
-            
-            <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+            <hr style="border:0; border-top:1px solid #eee; margin:4px 0;">
             
             <div style="display:flex; flex-direction:column; gap:8px;">
                 <label style="font-weight:bold; color:#7A5A2F;">새 멤버 추가</label>
@@ -483,7 +485,40 @@ function ensureMemberModal() {
                 </div>
             </div>
             
-            <button onclick="closeModal('memberModal')" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px; margin-top:4px;">닫기</button>
+            <div style="display:flex; gap:10px;">
+                <button onclick="openGroupModal()" style="flex:1; padding:12px; border:1.5px solid #b3d9f5; border-radius:30px; cursor:pointer; background:#E8F4FD; color:#1a6ba0; font-weight:bold; font-size:15px;">👥 그룹 관리</button>
+                <button onclick="closeModal('memberModal')" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px;">닫기</button>
+            </div>
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function ensureGroupModal() {
+    const existing = document.getElementById('groupModal');
+    if (existing && existing.dataset.injected === 'true') return;
+    if (existing) existing.remove();
+
+    const html = `
+    <div id="groupModal" data-injected="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:10001; justify-content:center; align-items:center; backdrop-filter:blur(2px);">
+        <div style="background:#fff; padding:32px 40px; border-radius:30px; display:flex; flex-direction:column; gap:16px; min-width:500px; max-width:600px; width:90%; max-height:90vh; overflow-y:auto; box-shadow:0 10px 25px rgba(0,0,0,0.1);">
+            <h2 style="margin:0; font-family:'TMoneyDungunbaram', sans-serif; color:#7A5A2F; font-size:24px; text-align:center;">그룹 관리</h2>
+
+            <div id="groupList" style="margin-bottom:4px;"></div>
+
+            <hr style="border:0; border-top:1px solid #eee; margin:0;">
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <label style="font-weight:bold; color:#7A5A2F;">새 그룹 추가</label>
+                <input type="text" id="newGroupName" placeholder="그룹 이름 (예: 합방팀A)" style="padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box; width:100%;">
+                <input type="text" id="groupMemberSearch" placeholder="🔍 멤버 검색..." oninput="filterGroupMemberPicker()" style="padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box; width:100%;">
+                <div id="groupMemberPicker" style="display:flex; flex-wrap:wrap; gap:8px; max-height:180px; overflow-y:auto; padding:10px; background:#fafaf9; border:1px solid #e5e7eb; border-radius:16px;"></div>
+                <div id="groupSelectedPreview" style="font-size:13px; color:#7A5A2F; font-weight:700; min-height:18px; padding:0 4px;"></div>
+                <button id="groupSaveBtn" onclick="saveGroup()" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#FDE047; color:#7A5A2F; font-weight:bold; font-size:15px;">그룹 저장</button>
+                <button id="groupCancelEditBtn" onclick="cancelGroupEdit()" style="display:none; width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px;">수정 취소</button>
+            </div>
+
+            <button onclick="closeModal('groupModal')" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px;">닫기</button>
         </div>
     </div>`;
     document.body.insertAdjacentHTML('beforeend', html);
@@ -625,6 +660,7 @@ async function loadGroupsFromFirebase() {
 }
 
 window.openGroupModal = function() {
+    ensureGroupModal();
     resetGroupForm();
     renderGroupList();
     document.getElementById('groupModal').style.display = 'flex';
