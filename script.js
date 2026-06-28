@@ -486,7 +486,7 @@ function ensureMemberModal() {
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button onclick="openGroupModal()" style="flex:1; padding:12px; border:1.5px solid #b3d9f5; border-radius:30px; cursor:pointer; background:#E8F4FD; color:#1a6ba0; font-weight:bold; font-size:15px;">👥 그룹 관리</button>
+                <button onclick="openGroupModal()" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#F48FB1; color:white; font-weight:bold; font-size:15px;">👥 그룹 관리</button>
                 <button onclick="closeModal('memberModal')" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px;">닫기</button>
             </div>
         </div>
@@ -514,7 +514,7 @@ function ensureGroupModal() {
                 <input type="text" id="groupMemberSearch" placeholder="🔍 멤버 검색..." oninput="filterGroupMemberPicker()" style="padding:12px; border-radius:30px; border:1px solid #ddd; outline:none; font-weight:bold; box-sizing:border-box; width:100%;">
                 <div id="groupMemberPicker" style="display:flex; flex-wrap:wrap; gap:8px; max-height:180px; overflow-y:auto; padding:10px; background:#fafaf9; border:1px solid #e5e7eb; border-radius:16px;"></div>
                 <div id="groupSelectedPreview" style="font-size:13px; color:#7A5A2F; font-weight:700; min-height:18px; padding:0 4px;"></div>
-                <button id="groupSaveBtn" onclick="saveGroup()" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#FDE047; color:#7A5A2F; font-weight:bold; font-size:15px;">그룹 저장</button>
+                <button id="groupSaveBtn" onclick="saveGroup()" style="width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#ffc595; color:white; font-weight:bold; font-size:15px;">그룹 저장</button>
                 <button id="groupCancelEditBtn" onclick="cancelGroupEdit()" style="display:none; width:100%; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px;">수정 취소</button>
             </div>
 
@@ -681,7 +681,7 @@ function renderGroupList() {
         div.innerHTML = `
             <span style="font-weight:900; color:#7A5A2F; flex:1; min-width:0;">👥 ${g.name}</span>
             <span style="font-size:12px; color:#888; flex:2; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${(g.members||[]).join(', ')}</span>
-            <button onclick="editGroup('${g.name}')" style="background:#E8F4FD; border:1.5px solid #b3d9f5; color:#1a6ba0; font-size:12px; font-weight:900; padding:4px 10px; border-radius:7px; cursor:pointer; white-space:nowrap; flex-shrink:0;">수정</button>
+            <button onclick="editGroup('${g.name}')" style="background:#ffc595; border:none; color:white; font-size:12px; font-weight:900; padding:4px 10px; border-radius:7px; cursor:pointer; white-space:nowrap; flex-shrink:0;">수정</button>
             <button onclick="deleteGroup('${g.name}')" style="background:transparent; border:none; color:#e57373; font-size:18px; cursor:pointer; font-weight:900; line-height:1; padding:2px 4px; flex-shrink:0;">✕</button>
         `;
         container.appendChild(div);
