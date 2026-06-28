@@ -486,7 +486,7 @@ function ensureMemberModal() {
             </div>
             
             <div style="display:flex; gap:10px;">
-                <button onclick="openGroupModal()" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#F48FB1; color:white; font-weight:bold; font-size:15px;">👥 그룹 관리</button>
+                <button onclick="openGroupModal()" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#ffe6f0; color:#8c1b4f; font-weight:bold; font-size:15px;">👥 그룹 관리</button>
                 <button onclick="closeModal('memberModal')" style="flex:1; padding:12px; border:none; border-radius:30px; cursor:pointer; background:#f1f5f9; color:#64748b; font-weight:bold; font-size:15px;">닫기</button>
             </div>
         </div>
